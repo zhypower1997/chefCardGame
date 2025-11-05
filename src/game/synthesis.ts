@@ -355,23 +355,30 @@ export class SynthesisEngine {
       t => t.effect?.qualityUpgrade || t.effect?.freeFineQuality
     );
 
-    if (hasQualityUpgrade || hasTomato && hasEgg) {
+    // 只要有食材就计算品质（即使只有单个食材）
+    if (foodCards.length > 0) {
       // 计算基础分
       const freshnessScore = foodCards.filter(f => !f.isSpoiled()).length * 2;
       const toolScore = allCards.find(c => c.cardType === 'tool' && c.name === '锅')?.currentDurability === 5 ? 1 : 0;
       const auxiliaryScore = allCards.filter(c => c.cardType === 'auxiliary').length * 2;
       const totalScore = freshnessScore + toolScore + auxiliaryScore;
 
-      if (totalScore >= 6 || hasQualityUpgrade) {
-        baseQuality = 'excellent';
-        healValue = 8;
-        buffEffect = '饱腹：3回合不消耗饥饿，生命值+2';
-        tradeValue = 10;
-      } else if (totalScore >= 3) {
-        baseQuality = 'fine';
-        healValue = 6;
-        buffEffect = '饱腹：2回合不消耗饥饿';
-        tradeValue = 5;
+      // 只有番茄和鸡蛋的组合才能生成番茄炒蛋，否则生成普通料理
+      if (hasTomato && hasEgg) {
+        if (totalScore >= 6 || hasQualityUpgrade) {
+          baseQuality = 'excellent';
+          healValue = 8;
+          buffEffect = '饱腹：3回合不消耗饥饿，生命值+2';
+          tradeValue = 10;
+        } else if (totalScore >= 3) {
+          baseQuality = 'fine';
+          healValue = 6;
+          buffEffect = '饱腹：2回合不消耗饥饿';
+          tradeValue = 5;
+        }
+      } else {
+        // 单个食材或不同食材组合，生成普通料理
+        healValue = Math.max(2, Math.floor(totalScore / 2));
       }
     }
 
@@ -379,11 +386,21 @@ export class SynthesisEngine {
       healValue = Math.max(2, healValue - 1);
     }
 
-    const productName = baseQuality === 'excellent' 
-      ? '极品番茄炒蛋' 
-      : baseQuality === 'fine' 
-      ? '精品番茄炒蛋' 
-      : '番茄炒蛋';
+    // 根据食材组合决定成品名称
+    let productName = '普通料理';
+    if (hasTomato && hasEgg) {
+      productName = baseQuality === 'excellent'
+        ? '极品番茄炒蛋'
+        : baseQuality === 'fine'
+        ? '精品番茄炒蛋'
+        : '番茄炒蛋';
+    } else if (hasTomato) {
+      productName = '番茄料理';
+    } else if (hasEgg) {
+      productName = '鸡蛋料理';
+    } else if (foodCards.length > 0) {
+      productName = '混合料理';
+    }
 
     return new Card(
       'product',

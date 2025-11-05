@@ -71,10 +71,10 @@ export class GameManager {
         } else if (card.cardType === 'product') {
           // 成品卡在调味步骤中被替换
           this.player.removeCard(card.id);
-        } else if (card.cardType === 'food' && synthesisStep === 'cook') {
+        } else if (card.cardType === 'food' && step === 'cook') {
           // 食材卡在烹饪步骤中被消耗（预处理步骤只是标记，不消耗）
           this.player.removeCard(card.id);
-        } else if (card.cardType === 'food' && synthesisStep === 'preprocess') {
+        } else if (card.cardType === 'food' && step === 'preprocess') {
           // 预处理步骤不消耗食材卡，只是加工
           // 食材卡保留，等待烹饪步骤使用
         } else if (card.cardType === 'tool' && card.currentDurability <= 0) {
@@ -90,15 +90,13 @@ export class GameManager {
       });
 
       // 添加成品卡（仅在烹饪步骤完成后）
-      if (result.productCard && synthesisStep === 'cook') {
+      if (result.productCard && step === 'cook') {
         this.player.addCard(result.productCard);
-        // 使用成品卡恢复生命值/饥饿值
-        this.survivalManager.useProductCard(result.productCard);
-      } else if (result.productCard && synthesisStep === 'season') {
+        // 成品卡添加到卡牌库，玩家可以选择何时使用
+      } else if (result.productCard && step === 'season') {
         // 调味步骤中，替换原成品卡
         this.player.addCard(result.productCard);
-        // 使用增强后的成品卡
-        this.survivalManager.useProductCard(result.productCard);
+        // 增强后的成品卡添加到卡牌库
       }
     }
 
@@ -134,8 +132,7 @@ export class GameManager {
       // 添加成品卡
       if (result.productCard) {
         this.player.addCard(result.productCard);
-        // 使用成品卡
-        this.survivalManager.useProductCard(result.productCard);
+        // 成品卡添加到卡牌库，玩家可以选择何时使用
       }
     } else {
       // 合成失败，返还卡牌（卡牌已经在player.cards中，不需要额外操作）
