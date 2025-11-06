@@ -7,9 +7,11 @@ interface CardDisplayProps {
   isSelected: boolean;
   onSelect: () => void;
   onUse: () => void;
+  onDiscard?: () => void;
+  onSell?: () => void;
 }
 
-export function CardDisplay({ card, isSelected, onSelect, onUse }: CardDisplayProps) {
+export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSell }: CardDisplayProps) {
   const getCardColor = () => {
     switch (card.cardType) {
       case 'tool':
@@ -54,7 +56,9 @@ export function CardDisplay({ card, isSelected, onSelect, onUse }: CardDisplayPr
       onClick={onSelect}
     >
       <div className="flex justify-between items-start mb-2">
-        <h3 className="font-bold text-lg text-gray-800">{card.name}</h3>
+        <h3 className="font-bold text-lg text-gray-800">
+          {card.name}
+        </h3>
         <span className="text-xs bg-white px-2 py-1 rounded text-gray-600">
           {getCardTypeLabel()}
         </span>
@@ -69,8 +73,15 @@ export function CardDisplay({ card, isSelected, onSelect, onUse }: CardDisplayPr
 
       {/* 食材变质回合 */}
       {card.cardType === 'food' && (
-        <div className={`text-sm mb-1 ${card.isSpoiled() ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
-          {card.isSpoiled() ? '已变质' : `剩余: ${card.remainingSpoil}回合`}
+        <div className="space-y-1">
+          <div className={`text-sm ${card.isSpoiled() ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
+            {card.isSpoiled() ? '已变质' : `剩余: ${card.remainingSpoil}回合`}
+          </div>
+          {card.isPreprocessed && (
+            <div className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-semibold">
+              ✂️ 已预处理
+            </div>
+          )}
         </div>
       )}
 
@@ -110,18 +121,60 @@ export function CardDisplay({ card, isSelected, onSelect, onUse }: CardDisplayPr
         </div>
       )}
 
-      {/* 使用按钮（成品卡） */}
-      {card.cardType === 'product' && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onUse();
-          }}
-          className="mt-2 w-full bg-orange-500 text-white text-xs py-1 rounded hover:bg-orange-600"
-        >
-          使用
-        </button>
-      )}
+      {/* 操作按钮区域 */}
+      <div className="mt-2 space-y-1">
+        {/* 使用按钮（成品卡和可使用的特殊卡） */}
+        {(card.cardType === 'product' || 
+          (card.cardType === 'special' && (card.name === '燃料卡' || card.name === '诱饵卡' || card.name === '修复卡'))) && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onUse();
+            }}
+            className="w-full bg-orange-500 text-white text-xs py-1 rounded hover:bg-orange-600"
+          >
+            使用
+          </button>
+        )}
+
+        {/* 操作按钮组 */}
+        <div className="grid grid-cols-2 gap-1">
+          {/* 丢弃按钮 */}
+          {onDiscard && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                onDiscard();
+              }}
+              className="bg-gray-400 text-white text-xs py-1 rounded hover:bg-gray-500"
+            >
+              丢弃
+            </button>
+          )}
+
+          {/* 售卖按钮 */}
+          {onSell && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const price = card.tradeValue || 
+                  (card.cardType === 'tool' ? card.currentDurability * 2 :
+                   card.cardType === 'food' ? (card.isSpoiled() ? 0 : 1) :
+                   card.cardType === 'auxiliary' ? card.useCount :
+                   card.cardType === 'special' ? (card.name === '逗逗狐' ? 5 : 1) :
+                   card.cardType === 'product' ? 1 : 0);
+                if (confirm(`确定要以 ${price} 金币的价格售出 ${card.name} 吗？`)) {
+                  onSell();
+                }
+              }}
+              className="bg-green-500 text-white text-xs py-1 rounded hover:bg-green-600"
+            >
+              售卖
+            </button>
+          )}
+        </div>
+      </div>
 
       {/* 选中标记 */}
       {isSelected && (

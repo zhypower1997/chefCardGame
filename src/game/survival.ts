@@ -140,11 +140,61 @@ export class ThreatGenerator {
   }
 }
 
+// 探索掉落数据缓存
+let EXPLORE_DROPS_CACHE: Record<string, string[]> = {};
+
+// 从JSON加载探索掉落数据
+async function loadExploreDropsFromJSON(): Promise<void> {
+  try {
+    const response = await fetch('/explore-drops.json');
+    if (!response.ok) {
+      throw new Error('无法加载explore-drops.json');
+    }
+    const data = await response.json();
+    
+    // 清空缓存
+    EXPLORE_DROPS_CACHE = {};
+    
+    // 提取掉落列表
+    for (const [location, locationData] of Object.entries(data)) {
+      if (locationData && typeof locationData === 'object' && 'drops' in locationData) {
+        EXPLORE_DROPS_CACHE[location] = (locationData as any).drops || [];
+      }
+    }
+  } catch (error) {
+    console.warn('无法从JSON加载探索掉落，使用默认掉落:', error);
+    EXPLORE_DROPS_CACHE = EXPLORE_DROPS;
+  }
+}
+
+// 初始化探索掉落数据
+export async function initializeExploreDrops(): Promise<void> {
+  await loadExploreDropsFromJSON();
+  // 合并默认掉落（如果JSON中没有的）
+  for (const [location, drops] of Object.entries(EXPLORE_DROPS)) {
+    if (!EXPLORE_DROPS_CACHE[location]) {
+      EXPLORE_DROPS_CACHE[location] = drops;
+    }
+  }
+}
+
+// 获取探索掉落列表
+function getExploreDrops(location: string): string[] {
+  if (Object.keys(EXPLORE_DROPS_CACHE).length === 0) {
+    return EXPLORE_DROPS[location] || [];
+  }
+  return EXPLORE_DROPS_CACHE[location] || [];
+}
+
 // 探索系统
 export class ExploreSystem {
-  static explore(location: 'plain' | 'mine' | 'forest' | 'market'): Card[] {
-    const drops = EXPLORE_DROPS[location] || [];
+  static explore(location: 'plain' | 'mine' | 'forest' | 'market' | string): Card[] {
+    const drops = getExploreDrops(location);
     const cards: Card[] = [];
+    
+    if (drops.length === 0) {
+      return cards;
+    }
     
     // 随机获得1-2张卡牌
     const count = Math.floor(Math.random() * 2) + 1;

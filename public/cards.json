@@ -1,0 +1,148 @@
+{
+  "tools": [
+    {
+      "key": "knife",
+      "name": "刀",
+      "maxDurability": 3,
+      "trait": {
+        "name": "锋利",
+        "probability": 0.1,
+        "effect": "10%概率加工双倍食材"
+      },
+      "processingRules": {
+        "萝卜": ["萝卜块"],
+        "萝卜块": ["萝卜片"],
+        "萝卜片": ["萝卜丝"]
+      }
+    },
+    {
+      "key": "grater",
+      "name": "擦丝器",
+      "maxDurability": 5,
+      "trait": {
+        "name": "快速",
+        "effect": "可以直接将食材擦成丝"
+      },
+      "processingRules": {
+        "萝卜": ["萝卜丝"]
+      }
+    },
+    {
+      "key": "pot",
+      "name": "锅",
+      "maxDurability": 5,
+      "trait": {
+        "name": "导热",
+        "effect": "需火源激活"
+      }
+    },
+    {
+      "key": "fire",
+      "name": "火源",
+      "maxDurability": 0,
+      "trait": {
+        "name": "燃烧",
+        "effect": "每回合消耗1燃料卡，必选用于热菜合成"
+      }
+    }
+  ],
+  "foods": [
+    {
+      "key": "tomato",
+      "name": "番茄",
+      "spoilTurn": 3,
+      "trait": {
+        "name": "熟透",
+        "probability": 1,
+        "effect": "放置2回合后美味度+2"
+      }
+    },
+    {
+      "key": "egg",
+      "name": "鸡蛋",
+      "spoilTurn": 2,
+      "trait": {
+        "name": "双黄蛋",
+        "probability": 0.2,
+        "effect": "20%概率合成时品质提升"
+      }
+    },
+    {
+      "key": "radish",
+      "name": "萝卜",
+      "spoilTurn": 4,
+      "trait": {
+        "name": "新鲜",
+        "effect": "新鲜食材"
+      }
+    },
+    {
+      "key": "radish-chunk",
+      "name": "萝卜块",
+      "spoilTurn": 3,
+      "isProcessed": true
+    },
+    {
+      "key": "radish-slice",
+      "name": "萝卜片",
+      "spoilTurn": 2,
+      "isProcessed": true
+    },
+    {
+      "key": "radish-shred",
+      "name": "萝卜丝",
+      "spoilTurn": 2,
+      "isProcessed": true
+    }
+  ],
+  "auxiliaries": [
+    {
+      "key": "salt",
+      "name": "盐",
+      "useCount": 3,
+      "effect": "美味度+1"
+    },
+    {
+      "key": "oil",
+      "name": "油",
+      "useCount": 1,
+      "effect": "触发\"香煎\"增益"
+    },
+    {
+      "key": "sugar",
+      "name": "糖",
+      "useCount": 2,
+      "effect": "甜度+1"
+    }
+  ],
+  "specials": [
+    {
+      "key": "fox",
+      "name": "逗逗狐",
+      "trait": {
+        "name": "狐运",
+        "probability": 0.15,
+        "effect": "15%概率免消耗合成精品"
+      }
+    },
+    {
+      "key": "fuel",
+      "name": "燃料卡",
+      "useCount": 1,
+      "effect": "为火源提供燃料"
+    },
+    {
+      "key": "bait",
+      "name": "诱饵卡",
+      "useCount": 1,
+      "effect": "应对野兽威胁"
+    },
+    {
+      "key": "repair",
+      "name": "修复卡",
+      "useCount": 1,
+      "effect": "修复工具卡耐久"
+    }
+  ]
+}
+

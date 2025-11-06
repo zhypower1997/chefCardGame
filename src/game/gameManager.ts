@@ -2,7 +2,8 @@ import { Player, Synthesizer, GameState, Card, SynthesisResult } from '@/types/g
 import { SynthesisEngine } from './synthesis';
 import { SurvivalManager } from './survival';
 import { ExploreSystem } from './survival';
-import { createCard } from '@/data/cards';
+import { createCard, getRandomCardKeys } from '@/data/cards';
+import { SHOP_ITEMS } from '@/data/shop';
 
 export class GameManager {
   private player: Player;
@@ -75,8 +76,9 @@ export class GameManager {
           // 食材卡在烹饪步骤中被消耗（预处理步骤只是标记，不消耗）
           this.player.removeCard(card.id);
         } else if (card.cardType === 'food' && step === 'preprocess') {
-          // 预处理步骤不消耗食材卡，只是加工
-          // 食材卡保留，等待烹饪步骤使用
+          // 预处理步骤：如果食材被加工了（已在result.consumedCards中），则移除
+          // 否则保留（标记为已预处理）
+          this.player.removeCard(card.id);
         } else if (card.cardType === 'tool' && card.currentDurability <= 0) {
           // 工具卡耐久为0时移除
           this.player.removeCard(card.id);
@@ -145,20 +147,28 @@ export class GameManager {
   }
 
   // 探索
-  explore(location: 'plain' | 'mine' | 'forest' | 'market'): Card[] {
+  explore(location: 'plain' | 'mine' | 'forest' | 'market'): Card[] | null {
+    // 探索消耗1能量
+    if (!this.synthesizer.hasEnergy(1)) {
+      return null; // 能量不足，返回null表示探索失败
+    }
+
+    this.synthesizer.consumeEnergy(1);
     const cards = ExploreSystem.explore(location);
     cards.forEach(card => this.player.addCard(card));
     return cards;
   }
 
   // 使用卡牌
-  useCard(cardId: string): boolean {
+  useCard(cardId: string): { success: boolean; message: string } {
     const card = this.player.cards.find(c => c.id === cardId);
-    if (!card) return false;
+    if (!card) {
+      return { success: false, message: '卡牌不存在' };
+    }
 
     if (card.cardType === 'product') {
       this.survivalManager.useProductCard(card);
-      return true;
+      return { success: true, message: `使用${card.name}成功` };
     }
 
     // 其他卡牌的使用逻辑
@@ -169,20 +179,48 @@ export class GameManager {
         const toolToRepair = toolCards[0];
         toolToRepair.currentDurability = toolToRepair.maxDurability;
         this.player.removeCard(cardId);
-        return true;
+        return { success: true, message: `修复了${toolToRepair.name}的耐久度` };
+      } else {
+        return { success: false, message: '没有可修复的工具卡' };
       }
     }
 
     if (card.name === '燃料卡') {
-      // 为火源提供燃料（这里简化处理，直接消耗）
+      // 为火源提供燃料
       const fireCard = this.player.getCardByName('火源');
       if (fireCard) {
+        // 消耗燃料卡
         this.player.removeCard(cardId);
-        return true;
+        return { success: true, message: '燃料卡已使用，火源已补充燃料' };
+      } else {
+        return { success: false, message: '需要火源卡才能使用燃料卡' };
       }
     }
 
-    return false;
+    if (card.name === '诱饵卡') {
+      // 诱饵卡主要用于应对威胁事件
+      // 如果当前有野兽威胁，可以提前使用来应对
+      if (this.player.currentThreat && this.player.currentThreat.requirement === '需要诱饵卡') {
+        // 消耗诱饵卡并解决威胁
+        this.player.removeCard(cardId);
+        // 发放奖励
+        const rewardNames: string[] = [];
+        if (this.player.currentThreat.reward) {
+          this.player.currentThreat.reward.forEach(rewardCard => {
+            this.player.addCard(rewardCard);
+            rewardNames.push(rewardCard.name);
+          });
+        }
+        const threatName = this.player.currentThreat.name;
+        this.player.currentThreat = null;
+        const rewardMsg = rewardNames.length > 0 ? `，获得奖励：${rewardNames.join('、')}` : '';
+        return { success: true, message: `使用诱饵卡成功应对${threatName}${rewardMsg}` };
+      } else {
+        return { success: false, message: '当前没有需要诱饵卡的威胁事件（诱饵卡会在威胁出现时自动使用）' };
+      }
+    }
+
+    return { success: false, message: '无法使用此卡牌' };
   }
 
   // 合成转化
@@ -211,8 +249,103 @@ export class GameManager {
 
     // 回合开始处理
     this.currentTurn += 1;
-    this.synthesizer.recoverEnergy(1);
+    // 每回合能量自动加满
+    this.synthesizer.energy = this.synthesizer.maxEnergy;
     this.survivalManager.startTurn();
+    
+    // 每回合开始发两张卡牌
+    const cardKeys = getRandomCardKeys(2);
+    cardKeys.forEach(key => {
+      const card = createCard(key);
+      if (card) {
+        this.player.addCard(card);
+      }
+    });
+  }
+
+  // 丢弃卡牌
+  discardCard(cardId: string): boolean {
+    const card = this.player.cards.find(c => c.id === cardId);
+    if (!card) return false;
+    
+    this.player.removeCard(cardId);
+    return true;
+  }
+
+  // 售卖卡牌到市场
+  sellCard(cardId: string): { success: boolean; coins: number; message: string } {
+    const card = this.player.cards.find(c => c.id === cardId);
+    if (!card) {
+      return { success: false, coins: 0, message: '卡牌不存在' };
+    }
+
+    // 计算售价：有tradeValue的按tradeValue，没有的按类型设置默认价格
+    let price = card.tradeValue;
+    if (!price) {
+      // 根据卡牌类型设置默认价格
+      switch (card.cardType) {
+        case 'product':
+          price = 1; // 成品卡默认1金币
+          break;
+        case 'tool':
+          // 工具卡按耐久度计算：当前耐久度 * 2
+          price = card.currentDurability * 2;
+          break;
+        case 'food':
+          // 食材卡：新鲜的1金币，变质的0金币
+          price = card.isSpoiled() ? 0 : 1;
+          break;
+        case 'auxiliary':
+          // 辅料卡按剩余使用次数计算：使用次数 * 1
+          price = card.useCount;
+          break;
+        case 'special':
+          // 特殊卡：逗逗狐值5金币，其他1金币
+          price = card.name === '逗逗狐' ? 5 : 1;
+          break;
+        default:
+          price = 0;
+      }
+    }
+
+    // 移除卡牌并添加金币
+    this.player.removeCard(cardId);
+    this.player.addCoins(price);
+
+    return {
+      success: true,
+      coins: price,
+      message: `成功售出 ${card.name}，获得 ${price} 金币`
+    };
+  }
+
+  // 从商店购买卡牌
+  buyCard(cardKey: string): { success: boolean; message: string } {
+    const shopItem = SHOP_ITEMS.find(item => item.cardKey === cardKey);
+    if (!shopItem) {
+      return { success: false, message: '商品不存在' };
+    }
+
+    // 检查金币是否足够
+    if (!this.player.spendCoins(shopItem.price)) {
+      return { success: false, message: `金币不足，需要 ${shopItem.price} 金币` };
+    }
+
+    // 创建卡牌并添加到玩家卡牌库
+    const card = createCard(cardKey);
+    if (!card) {
+      // 如果创建失败，返还金币
+      this.player.addCoins(shopItem.price);
+      return { success: false, message: '购买失败：无法创建卡牌' };
+    }
+
+    this.player.addCard(card);
+    return { success: true, message: `成功购买 ${shopItem.name}，花费 ${shopItem.price} 金币` };
+  }
+
+  // 获取商店物品列表
+  getShopItems() {
+    return SHOP_ITEMS;
   }
 
   // 开始新游戏
@@ -227,6 +360,15 @@ export class GameManager {
     this.lastSynthesisResult = null;
     this.initializePlayerCards();
     this.survivalManager.startTurn();
+    
+    // 第一回合开始时也发两张卡牌
+    const cardKeys = getRandomCardKeys(2);
+    cardKeys.forEach(key => {
+      const card = createCard(key);
+      if (card) {
+        this.player.addCard(card);
+      }
+    });
   }
 }
 

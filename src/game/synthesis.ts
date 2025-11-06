@@ -1,4 +1,11 @@
 import { Card, SynthesisResult, SynthesisStep, Synthesizer, Player } from '@/types/game';
+import {
+  findMatchingRecipe,
+  calculateQualityScore,
+  calculateFinalQuality,
+  calculateFinalProductStats,
+} from '@/data/recipes';
+import { createCardByName } from '@/data/cards';
 
 // 分步合成逻辑
 export class SynthesisEngine {
@@ -45,22 +52,21 @@ export class SynthesisEngine {
         };
     }
 
-    if (!result.success) {
-      this.synthesizer.consumeEnergy(1);
-    }
+    // 无论成功还是失败都消耗能量
+    this.synthesizer.consumeEnergy(1);
 
     return result;
   }
 
   // 预处理步骤（食材加工）
   private preprocessStep(cards: Card[]): SynthesisResult {
-    const toolCard = cards.find(c => c.cardType === 'tool' && c.name === '刀');
+    const toolCards = cards.filter(c => c.cardType === 'tool' && c.isUsable());
     const foodCards = cards.filter(c => c.cardType === 'food');
 
-    if (!toolCard || !toolCard.isUsable()) {
+    if (toolCards.length === 0) {
       return {
         success: false,
-        message: '需要可用的刀进行预处理',
+        message: '需要可用的工具进行预处理',
         consumedCards: [],
         quality: 'normal'
       };
@@ -75,36 +81,120 @@ export class SynthesisEngine {
       };
     }
 
-    // 消耗工具耐久
-    toolCard.consumeDurability(1);
-
-    // 触发特性
+    // 尝试匹配工具和食材的加工规则
     const traitTriggers: Array<{ cardName: string; traitName: string; effect: any }> = [];
-    const toolTrait = toolCard.triggerTrait({});
-    if (toolTrait) {
-      traitTriggers.push({
-        cardName: toolCard.name,
-        traitName: toolCard.trait!.name,
-        effect: toolTrait
-      });
+    const processedCards: Card[] = [];
+    const newCards: Card[] = [];
+    let hasProcessed = false;
+
+    // 遍历每个食材，尝试找到可以加工它的工具
+    for (const foodCard of foodCards) {
+      let processed = false;
+
+      for (const toolCard of toolCards) {
+        if (!toolCard.processingRules || !toolCard.processingRules[toolCard.name]) {
+          console.debug(`工具 ${toolCard.name} 没有 processingRules 或规则为空`);
+          continue;
+        }
+
+        const rules = toolCard.processingRules[toolCard.name];
+        const resultNames = rules[foodCard.name];
+
+        console.debug(`检查加工规则: 工具=${toolCard.name}, 食材=${foodCard.name}, 结果=${resultNames ? resultNames.join(',') : '无匹配'}`);
+        console.debug(`processingRules结构:`, toolCard.processingRules);
+        console.debug(`rules内容:`, rules);
+
+        if (resultNames && resultNames.length > 0) {
+          // 找到匹配的加工规则，使用第一个结果
+          const resultName = resultNames[0];
+          console.debug(`尝试创建加工后的食材卡: ${resultName}`);
+
+          // 创建新的加工后的食材卡
+          const newCard = createCardByName(resultName);
+
+          if (!newCard) {
+            // 如果无法创建新卡，记录错误并返回错误结果
+            console.error(`无法创建加工后的食材卡: ${resultName}，工具: ${toolCard.name}，食材: ${foodCard.name}`);
+            console.error(`请检查cards.json中是否有name为"${resultName}"的卡片定义`);
+            // 返回错误，避免走到默认预处理逻辑
+            return {
+              success: false,
+              message: `无法创建加工后的食材: ${resultName}，请检查卡片数据是否正确加载`,
+              consumedCards: [],
+              quality: 'normal'
+            };
+          }
+
+          console.debug(`成功创建加工后的食材卡: ${newCard.name}`);
+
+          // 预处理后的卡牌增加价格
+          // 取原食材价格和新卡牌价格中的较大值，然后增加1
+          const originalFoodPrice = foodCard.tradeValue || (foodCard.isSpoiled() ? 0 : 1);
+          const newCardBasePrice = newCard.tradeValue || (newCard.isSpoiled() ? 0 : 1);
+          newCard.tradeValue = Math.max(originalFoodPrice, newCardBasePrice) + 1;
+
+          // 消耗原食材卡
+          processedCards.push(foodCard);
+          // 消耗工具耐久
+          toolCard.consumeDurability(1);
+          // 添加新卡牌
+          newCards.push(newCard);
+          processed = true;
+          hasProcessed = true;
+
+          // 触发工具特性
+          const toolTrait = toolCard.triggerTrait({});
+          if (toolTrait) {
+            traitTriggers.push({
+              cardName: toolCard.name,
+              traitName: toolCard.trait!.name,
+              effect: toolTrait
+            });
+          }
+
+          break; // 找到匹配的工具后跳出
+        }
+      }
+
+      // 如果没有找到匹配的加工规则，使用默认的预处理标记
+      if (!processed) {
+        foodCard.markAsPreprocessed();
+        // 预处理后的卡牌增加价格
+        const basePrice = foodCard.tradeValue || (foodCard.isSpoiled() ? 0 : 1);
+        foodCard.tradeValue = basePrice + 1;
+
+        const foodTrait = foodCard.triggerTrait({});
+        if (foodTrait) {
+          traitTriggers.push({
+            cardName: foodCard.name,
+            traitName: foodCard.trait!.name,
+            effect: foodTrait
+          });
+        }
+      }
     }
 
-    // 处理食材特性
-    for (const foodCard of foodCards) {
-      const foodTrait = foodCard.triggerTrait({});
-      if (foodTrait) {
-        traitTriggers.push({
-          cardName: foodCard.name,
-          traitName: foodCard.trait!.name,
-          effect: foodTrait
-        });
-      }
+    // 如果使用了工具但没有找到匹配规则，消耗第一个工具的耐久
+    if (toolCards.length > 0 && !hasProcessed) {
+      toolCards[0].consumeDurability(1);
+    }
+
+    // 将新创建的卡牌添加到玩家卡牌库
+    newCards.forEach(card => {
+      this.player.addCard(card);
+    });
+
+    const consumedCards = [...processedCards];
+    if (toolCards.length > 0 && hasProcessed) {
+      consumedCards.push(...toolCards.filter(t => t.currentDurability <= 0 || consumedCards.length > 0));
     }
 
     return {
       success: true,
-      message: '预处理完成',
-      consumedCards: [toolCard], // 预处理只消耗工具卡，食材卡保留
+      message: hasProcessed
+        ? `预处理完成，获得：${newCards.map(c => c.name).join('、')}`
+        : '预处理完成',
+      consumedCards: consumedCards.length > 0 ? consumedCards : (toolCards.length > 0 ? [toolCards[0]] : []),
       traitTriggers,
       quality: 'normal'
     };
@@ -114,7 +204,7 @@ export class SynthesisEngine {
   private cookStep(cards: Card[]): SynthesisResult {
     const potCard = cards.find(c => c.cardType === 'tool' && c.name === '锅');
     const fireCard = cards.find(c => c.name === '火源');
-    const preprocessedFood = cards.filter(c => c.cardType === 'food');
+    const preprocessedFood = cards.filter(c => c.isPreprocessedFood());
 
     if (!potCard || !potCard.isUsable()) {
       return {
@@ -223,7 +313,7 @@ export class SynthesisEngine {
       success: true,
       message: '调味完成',
       productCard: enhancedProduct,
-      consumedCards: consumedAuxiliary,
+      consumedCards: [productCard, ...consumedAuxiliary], // 原始成品卡和辅料卡都需要消耗
       quality: this.calculateQuality([], null, [], enhancedProduct)
     };
   }
@@ -249,6 +339,7 @@ export class SynthesisEngine {
     const hasTool = filteredCards.some(c => c.cardType === 'tool' && c.name === '刀');
 
     if (!hasPot || !hasFire || !hasFood) {
+      // 合成失败，消耗能量
       this.synthesizer.consumeEnergy(1);
       return {
         success: false,
@@ -257,6 +348,9 @@ export class SynthesisEngine {
         quality: 'normal'
       };
     }
+
+    // 合成成功，消耗能量
+    this.synthesizer.consumeEnergy(1);
 
     // 30%概率触发混乱烹饪
     const isChaos = Math.random() < 0.3;
@@ -341,65 +435,62 @@ export class SynthesisEngine {
     traitTriggers: Array<{ cardName: string; traitName: string; effect: any }>,
     chaosEffect: boolean = false
   ): Card {
-    // 根据食材组合生成对应成品
-    const hasTomato = foodCards.some(c => c.name === '番茄');
-    const hasEgg = foodCards.some(c => c.name === '鸡蛋');
 
-    let baseQuality = 'normal';
-    let healValue = 4;
-    let buffEffect = '';
-    let tradeValue = 2;
+    // 获取食材名称列表
+    const ingredientNames = foodCards.map(f => f.name);
 
-    // 检查品质提升特性
-    const hasQualityUpgrade = traitTriggers.some(
-      t => t.effect?.qualityUpgrade || t.effect?.freeFineQuality
+    // 查找匹配的食谱
+    const recipe = findMatchingRecipe(ingredientNames);
+    if (!recipe) {
+      // 如果没有匹配的食谱，返回默认料理
+      return new Card(
+        'product',
+        '未知料理',
+        0,
+        undefined,
+        0,
+        1,
+        undefined,
+        2,
+        '',
+        1
+      );
+    }
+
+    // 获取工具卡和辅料卡
+    const toolCard = allCards.find(c => c.cardType === 'tool' && c.name === '锅');
+    const auxiliaryCards = allCards.filter(c => c.cardType === 'auxiliary');
+
+    // 计算品质分数
+    const qualityScore = calculateQualityScore(
+      foodCards,
+      toolCard || null,
+      auxiliaryCards,
+      recipe
     );
 
-    // 只要有食材就计算品质（即使只有单个食材）
-    if (foodCards.length > 0) {
-      // 计算基础分
-      const freshnessScore = foodCards.filter(f => !f.isSpoiled()).length * 2;
-      const toolScore = allCards.find(c => c.cardType === 'tool' && c.name === '锅')?.currentDurability === 5 ? 1 : 0;
-      const auxiliaryScore = allCards.filter(c => c.cardType === 'auxiliary').length * 2;
-      const totalScore = freshnessScore + toolScore + auxiliaryScore;
+    // 计算最终品质
+    const quality = calculateFinalQuality(
+      recipe,
+      qualityScore,
+      traitTriggers,
+      foodCards,
+      auxiliaryCards
+    );
 
-      // 只有番茄和鸡蛋的组合才能生成番茄炒蛋，否则生成普通料理
-      if (hasTomato && hasEgg) {
-        if (totalScore >= 6 || hasQualityUpgrade) {
-          baseQuality = 'excellent';
-          healValue = 8;
-          buffEffect = '饱腹：3回合不消耗饥饿，生命值+2';
-          tradeValue = 10;
-        } else if (totalScore >= 3) {
-          baseQuality = 'fine';
-          healValue = 6;
-          buffEffect = '饱腹：2回合不消耗饥饿';
-          tradeValue = 5;
-        }
-      } else {
-        // 单个食材或不同食材组合，生成普通料理
-        healValue = Math.max(2, Math.floor(totalScore / 2));
-      }
-    }
+    // 计算最终属性
+    const { healValue: baseHealValue, buffEffect: baseBuffEffect, tradeValue: baseTradeValue } =
+      calculateFinalProductStats(recipe, quality, auxiliaryCards);
 
-    if (chaosEffect) {
-      healValue = Math.max(2, healValue - 1);
-    }
+    // 混乱烹饪效果
+    let finalHealValue = chaosEffect ? Math.max(2, baseHealValue - 1) : baseHealValue;
 
-    // 根据食材组合决定成品名称
-    let productName = '普通料理';
-    if (hasTomato && hasEgg) {
-      productName = baseQuality === 'excellent'
-        ? '极品番茄炒蛋'
-        : baseQuality === 'fine'
-        ? '精品番茄炒蛋'
-        : '番茄炒蛋';
-    } else if (hasTomato) {
-      productName = '番茄料理';
-    } else if (hasEgg) {
-      productName = '鸡蛋料理';
-    } else if (foodCards.length > 0) {
-      productName = '混合料理';
+    // 根据品质生成成品名称
+    let productName = recipe.name;
+    if (quality === 'excellent') {
+      productName = `极品${recipe.name}`;
+    } else if (quality === 'fine') {
+      productName = `精品${recipe.name}`;
     }
 
     return new Card(
@@ -410,9 +501,9 @@ export class SynthesisEngine {
       0,
       1,
       undefined,
-      healValue,
-      buffEffect,
-      tradeValue
+      finalHealValue,
+      baseBuffEffect,
+      baseTradeValue
     );
   }
 
@@ -446,6 +537,11 @@ export class SynthesisEngine {
     if (hasSugar) {
       enhanced.healValue = (enhanced.healValue || 0) + 1;
     }
+
+    // 调味后的卡牌增加价格
+    // 基础价格 + 使用的辅料数量
+    const basePrice = enhanced.tradeValue || 1;
+    enhanced.tradeValue = basePrice + auxiliaryCards.length;
 
     return enhanced;
   }

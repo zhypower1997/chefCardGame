@@ -4,9 +4,10 @@ interface ExplorePanelProps {
   onExplore: (location: 'plain' | 'mine' | 'forest' | 'market') => void;
   showExplore: boolean;
   onToggleExplore: () => void;
+  hasEnergy: boolean;
 }
 
-export function ExplorePanel({ onExplore, showExplore, onToggleExplore }: ExplorePanelProps) {
+export function ExplorePanel({ onExplore, showExplore, onToggleExplore, hasEnergy }: ExplorePanelProps) {
   const locations: Array<{
     key: 'plain' | 'mine' | 'forest' | 'market';
     name: string;
@@ -57,7 +58,14 @@ export function ExplorePanel({ onExplore, showExplore, onToggleExplore }: Explor
             <button
               key={location.key}
               onClick={() => onExplore(location.key)}
-              className="w-full p-4 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border-2 border-green-200 hover:border-green-400 transition-all text-left"
+              disabled={!hasEnergy}
+              className={`
+                w-full p-4 rounded-lg border-2 transition-all text-left
+                ${hasEnergy
+                  ? 'bg-gradient-to-r from-green-50 to-blue-50 border-green-200 hover:border-green-400'
+                  : 'bg-gray-100 border-gray-300 cursor-not-allowed opacity-50'
+                }
+              `}
             >
               <div className="flex items-center gap-3">
                 <span className="text-3xl">{location.icon}</span>

@@ -74,6 +74,16 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
         </div>
       )}
 
+      {/* 金币 */}
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-gray-700 font-semibold">💰 金币</span>
+          <span className="text-lg font-bold text-yellow-600">
+            {player.coins}
+          </span>
+        </div>
+      </div>
+
       {/* 卡牌统计 */}
       <div className="grid grid-cols-2 gap-2 text-sm">
         <div className="bg-blue-50 p-2 rounded">

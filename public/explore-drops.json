@@ -1,0 +1,39 @@
+{
+  "plain": {
+    "name": "平原",
+    "description": "获得基础食材（番茄、鸡蛋、盐）",
+    "icon": "🌾",
+    "drops": ["tomato", "egg", "salt"]
+  },
+  "mine": {
+    "name": "矿山",
+    "description": "获得燃料卡、修复卡",
+    "icon": "⛏️",
+    "drops": ["fuel", "repair"]
+  },
+  "forest": {
+    "name": "森林",
+    "description": "获得燃料卡、油",
+    "icon": "🌲",
+    "drops": ["fuel", "oil"]
+  },
+  "market": {
+    "name": "市场",
+    "description": "获得糖、油",
+    "icon": "🏪",
+    "drops": ["sugar", "oil"]
+  },
+  "vegetable-garden": {
+    "name": "菜园",
+    "description": "获得萝卜等蔬菜",
+    "icon": "🥬",
+    "drops": ["radish"]
+  },
+  "tool-shop": {
+    "name": "工具店",
+    "description": "获得工具卡",
+    "icon": "🔧",
+    "drops": ["grater", "repair"]
+  }
+}
+

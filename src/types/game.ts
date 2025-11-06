@@ -9,6 +9,9 @@ export interface Trait {
   handler?: (context: any) => any; // 特性处理函数
 }
 
+// 加工规则：工具名 -> 食材名 -> 加工后的食材名数组
+export type ProcessingRules = Record<string, Record<string, string[]>>;
+
 // 卡牌基础类
 export class Card {
   cardType: CardType;
@@ -24,6 +27,8 @@ export class Card {
   buffEffect?: string; // 成品卡buff效果
   tradeValue?: number; // 交易价值
   id: string; // 唯一标识
+  isPreprocessed?: boolean; // 是否已预处理（食材卡）
+  processingRules?: ProcessingRules; // 工具卡的加工规则
 
   constructor(
     cardType: CardType,
@@ -35,7 +40,8 @@ export class Card {
     effect?: string,
     healValue?: number,
     buffEffect?: string,
-    tradeValue?: number
+    tradeValue?: number,
+    processingRules?: ProcessingRules
   ) {
     this.id = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
     this.cardType = cardType;
@@ -50,6 +56,8 @@ export class Card {
     this.healValue = healValue;
     this.buffEffect = buffEffect;
     this.tradeValue = tradeValue;
+    this.isPreprocessed = false; // 默认未预处理
+    this.processingRules = processingRules;
   }
 
   // 检查是否变质
@@ -94,6 +102,18 @@ export class Card {
       return this.trait.handler(context);
     }
     return { traitName: this.trait.name, effect: this.trait.effect };
+  }
+
+  // 标记为已预处理
+  markAsPreprocessed(): void {
+    if (this.cardType === 'food') {
+      this.isPreprocessed = true;
+    }
+  }
+
+  // 检查是否已预处理
+  isPreprocessedFood(): boolean {
+    return this.cardType === 'food' && this.isPreprocessed === true;
   }
 }
 
@@ -170,6 +190,7 @@ export class Player {
   maxHunger: number = 10;
   health: number = 10; // 生命值
   maxHealth: number = 10;
+  coins: number = 0; // 金币
   cards: Card[] = []; // 持有卡牌列表
   currentTask: Task | null = null; // 当前任务
   currentThreat: ThreatEvent | null = null; // 当前威胁
@@ -233,6 +254,20 @@ export class Player {
   // 检查是否有buff
   hasBuff(name: string): boolean {
     return this.buffs.some(buff => buff.name === name);
+  }
+
+  // 添加金币
+  addCoins(amount: number): void {
+    this.coins += amount;
+  }
+
+  // 消费金币
+  spendCoins(amount: number): boolean {
+    if (this.coins >= amount) {
+      this.coins -= amount;
+      return true;
+    }
+    return false;
   }
 }
 

@@ -1,0 +1,57 @@
+[
+  {
+    "id": "tomato-egg",
+    "name": "番茄炒蛋",
+    "requiredIngredients": ["番茄", "鸡蛋"],
+    "baseQuality": "normal",
+    "baseHealValue": 4,
+    "baseBuffEffect": "",
+    "baseTradeValue": 2,
+    "qualityRules": {
+      "fine": {
+        "minScore": 3
+      },
+      "excellent": {
+        "minScore": 6,
+        "requiredTraits": ["双黄蛋", "狐运"]
+      }
+    },
+    "auxiliaryEffects": {
+      "盐": {
+        "healBonus": 1
+      },
+      "油": {
+        "buffEffect": "香煎增益",
+        "qualityBonus": 1
+      },
+      "糖": {
+        "healBonus": 1
+      }
+    }
+  },
+  {
+    "id": "tomato-only",
+    "name": "番茄料理",
+    "requiredIngredients": ["番茄"],
+    "baseQuality": "normal",
+    "baseHealValue": 2,
+    "baseTradeValue": 1
+  },
+  {
+    "id": "egg-only",
+    "name": "鸡蛋料理",
+    "requiredIngredients": ["鸡蛋"],
+    "baseQuality": "normal",
+    "baseHealValue": 2,
+    "baseTradeValue": 1
+  },
+  {
+    "id": "mixed",
+    "name": "混合料理",
+    "requiredIngredients": [],
+    "baseQuality": "normal",
+    "baseHealValue": 2,
+    "baseTradeValue": 1
+  }
+]
+

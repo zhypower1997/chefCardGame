@@ -8,6 +8,10 @@ import { SynthesisPanel } from './SynthesisPanel';
 import { PlayerStatus } from './PlayerStatus';
 import { TaskPanel } from './TaskPanel';
 import { ExplorePanel } from './ExplorePanel';
+import { ShopPanel } from './ShopPanel';
+import { initializeRecipes } from '@/data/recipes';
+import { initializeCards } from '@/data/cards';
+import { initializeExploreDrops } from '@/game/survival';
 
 export default function GameBoard() {
   const [gameManager] = useState(() => new GameManager());
@@ -16,6 +20,18 @@ export default function GameBoard() {
   const [synthesisStep, setSynthesisStep] = useState<SynthesisStep>('preprocess');
   const [message, setMessage] = useState<string>('');
   const [showExplore, setShowExplore] = useState(false);
+  const [showShop, setShowShop] = useState(false);
+
+  // 初始化时加载JSON配置
+  useEffect(() => {
+    Promise.all([
+      initializeCards(),
+      initializeRecipes(),
+      initializeExploreDrops()
+    ]).catch(err => {
+      console.error('加载配置失败:', err);
+    });
+  }, []);
 
   const updateGameState = () => {
     setGameState(gameManager.getGameState());
@@ -55,17 +71,41 @@ export default function GameBoard() {
   };
 
   const handleUseCard = (cardId: string) => {
-    const success = gameManager.useCard(cardId);
+    const result = gameManager.useCard(cardId);
+    setMessage(result.message);
+    updateGameState();
+  };
+
+  const handleDiscardCard = (cardId: string) => {
+    const success = gameManager.discardCard(cardId);
     if (success) {
-      setMessage('卡牌使用成功');
+      setMessage('卡牌已丢弃');
+      // 如果丢弃的卡牌在选中列表中，移除它
+      setSelectedCards(prev => prev.filter(id => id !== cardId));
     } else {
-      setMessage('无法使用此卡牌');
+      setMessage('丢弃失败：卡牌不存在');
     }
+    updateGameState();
+  };
+
+  const handleSellCard = (cardId: string) => {
+    const result = gameManager.sellCard(cardId);
+    setMessage(result.message);
+    updateGameState();
+  };
+
+  const handleBuyCard = (cardKey: string) => {
+    const result = gameManager.buyCard(cardKey);
+    setMessage(result.message);
     updateGameState();
   };
 
   const handleExplore = (location: 'plain' | 'mine' | 'forest' | 'market') => {
     const cards = gameManager.explore(location);
+    if (cards === null) {
+      setMessage('能量值不足，无法探索');
+      return;
+    }
     setMessage(`探索成功！获得 ${cards.length} 张卡牌：${cards.map(c => c.name).join('、')}`);
     setShowExplore(false);
     updateGameState();
@@ -134,12 +174,19 @@ export default function GameBoard() {
                 />
               </div>
 
-              {/* 右侧：探索 */}
-              <div>
+              {/* 右侧：探索和商店 */}
+              <div className="space-y-4">
                 <ExplorePanel
                   onExplore={handleExplore}
                   showExplore={showExplore}
                   onToggleExplore={() => setShowExplore(!showExplore)}
+                  hasEnergy={gameState.synthesizer.hasEnergy(1)}
+                />
+                <ShopPanel
+                  onBuy={handleBuyCard}
+                  showShop={showShop}
+                  onToggleShop={() => setShowShop(!showShop)}
+                  playerCoins={gameState.player.coins}
                 />
               </div>
             </div>
@@ -155,6 +202,8 @@ export default function GameBoard() {
                     isSelected={selectedCards.includes(card.id)}
                     onSelect={() => handleCardSelect(card.id)}
                     onUse={() => handleUseCard(card.id)}
+                    onDiscard={() => handleDiscardCard(card.id)}
+                    onSell={() => handleSellCard(card.id)}
                   />
                 ))}
               </div>
