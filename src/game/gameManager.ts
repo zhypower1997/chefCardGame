@@ -20,8 +20,9 @@ export class GameManager {
     this.synthesizer = new Synthesizer();
     this.synthesisEngine = new SynthesisEngine(this.synthesizer, this.player);
     this.survivalManager = new SurvivalManager(this.player);
-    
+
     // 初始化玩家卡牌（给一些起始卡牌）
+    // 注意：如果JSON尚未加载，会使用默认数据库（包含processingRules）
     this.initializePlayerCards();
   }
 
@@ -34,6 +35,14 @@ export class GameManager {
         this.player.addCard(card);
       }
     });
+  }
+
+  // 重新初始化玩家卡片（在JSON加载完成后调用，确保使用最新的卡片数据）
+  public reinitializePlayerCards(): void {
+    // 清空现有卡片
+    this.player.cards = [];
+    // 重新初始化
+    this.initializePlayerCards();
   }
 
   // 获取游戏状态
@@ -57,7 +66,7 @@ export class GameManager {
       .filter((c): c is Card => c !== undefined);
 
     const result = this.synthesisEngine.stepByStepSynthesis(cards, step);
-    
+
     if (result.success) {
       // 消耗卡牌
       result.consumedCards.forEach(card => {
@@ -104,7 +113,7 @@ export class GameManager {
 
     this.lastSynthesisResult = result;
     this.survivalManager.setLastSynthesisResult(result);
-    
+
     return result;
   }
 
@@ -115,7 +124,7 @@ export class GameManager {
       .filter((c): c is Card => c !== undefined);
 
     const result = this.synthesisEngine.fullThrowSynthesis(cards);
-    
+
     if (result.success) {
       // 消耗所有使用的卡牌
       result.consumedCards.forEach(card => {
@@ -142,7 +151,7 @@ export class GameManager {
 
     this.lastSynthesisResult = result;
     this.survivalManager.setLastSynthesisResult(result);
-    
+
     return result;
   }
 
@@ -252,7 +261,7 @@ export class GameManager {
     // 每回合能量自动加满
     this.synthesizer.energy = this.synthesizer.maxEnergy;
     this.survivalManager.startTurn();
-    
+
     // 每回合开始发两张卡牌
     const cardKeys = getRandomCardKeys(2);
     cardKeys.forEach(key => {
@@ -267,7 +276,7 @@ export class GameManager {
   discardCard(cardId: string): boolean {
     const card = this.player.cards.find(c => c.id === cardId);
     if (!card) return false;
-    
+
     this.player.removeCard(cardId);
     return true;
   }
@@ -360,7 +369,7 @@ export class GameManager {
     this.lastSynthesisResult = null;
     this.initializePlayerCards();
     this.survivalManager.startTurn();
-    
+
     // 第一回合开始时也发两张卡牌
     const cardKeys = getRandomCardKeys(2);
     cardKeys.forEach(key => {

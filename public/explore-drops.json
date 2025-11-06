@@ -3,7 +3,7 @@
     "name": "平原",
     "description": "获得基础食材（番茄、鸡蛋、盐）",
     "icon": "🌾",
-    "drops": ["tomato", "egg", "salt"]
+    "drops": ["tomato", "egg", "salt", "radish"]
   },
   "mine": {
     "name": "矿山",

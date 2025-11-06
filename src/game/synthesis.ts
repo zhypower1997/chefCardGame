@@ -92,12 +92,22 @@ export class SynthesisEngine {
       let processed = false;
 
       for (const toolCard of toolCards) {
-        if (!toolCard.processingRules || !toolCard.processingRules[toolCard.name]) {
-          console.debug(`工具 ${toolCard.name} 没有 processingRules 或规则为空`);
+        console.log(`工具 ${toolCard.name} 的 processingRules:`, toolCard);
+        // 检查 processingRules 是否存在
+        if (!toolCard.processingRules) {
+          console.log(`工具 ${toolCard.name} 没有 processingRules`);
           continue;
         }
 
+        // 获取该工具的加工规则
         const rules = toolCard.processingRules[toolCard.name];
+        if (!rules) {
+          console.log(`工具 ${toolCard.name} 的 processingRules 中没有 ${toolCard.name} 的规则`);
+          console.log(`processingRules结构:`, toolCard.processingRules);
+          continue;
+        }
+
+        // 查找该食材的加工结果
         const resultNames = rules[foodCard.name];
 
         console.debug(`检查加工规则: 工具=${toolCard.name}, 食材=${foodCard.name}, 结果=${resultNames ? resultNames.join(',') : '无匹配'}`);
@@ -119,7 +129,7 @@ export class SynthesisEngine {
             // 返回错误，避免走到默认预处理逻辑
             return {
               success: false,
-              message: `无法创建加工后的食材: ${resultName}，请检查卡片数据是否正确加载`,
+              message: `无法创建加工后的食材: ${resultName}，请检查卡片数据是否正确加载。请确保cards.json中包含名称为"${resultName}"的食材卡片定义。`,
               consumedCards: [],
               quality: 'normal'
             };
@@ -132,6 +142,9 @@ export class SynthesisEngine {
           const originalFoodPrice = foodCard.tradeValue || (foodCard.isSpoiled() ? 0 : 1);
           const newCardBasePrice = newCard.tradeValue || (newCard.isSpoiled() ? 0 : 1);
           newCard.tradeValue = Math.max(originalFoodPrice, newCardBasePrice) + 1;
+
+          // 对新卡打标预处理
+          newCard.markAsPreprocessed();
 
           // 消耗原食材卡
           processedCards.push(foodCard);

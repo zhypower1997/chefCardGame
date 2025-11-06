@@ -12,6 +12,13 @@ export const CARD_DATABASE: Record<string, Omit<Card, 'id' | 'currentDurability'
       probability: 0.1,
       effect: '10%概率加工双倍食材',
       handler: () => ({ doubleFood: true })
+    },
+    processingRules: {
+      '刀': {
+        '萝卜': ['萝卜块'],
+        '萝卜块': ['萝卜片'],
+        '萝卜片': ['萝卜丝']
+      }
     }
   },
   pot: {
@@ -32,7 +39,7 @@ export const CARD_DATABASE: Record<string, Omit<Card, 'id' | 'currentDurability'
       effect: '每回合消耗1燃料卡，必选用于热菜合成'
     }
   },
-  
+
   // 基础食材卡
   tomato: {
     cardType: 'food' as CardType,
@@ -63,7 +70,7 @@ export const CARD_DATABASE: Record<string, Omit<Card, 'id' | 'currentDurability'
       handler: () => ({ qualityUpgrade: true })
     }
   },
-  
+
   // 辅料卡
   salt: {
     cardType: 'auxiliary' as CardType,
@@ -86,7 +93,7 @@ export const CARD_DATABASE: Record<string, Omit<Card, 'id' | 'currentDurability'
     useCount: 2,
     effect: '甜度+1'
   },
-  
+
   // 特殊卡
   fox: {
     cardType: 'special' as CardType,
@@ -120,7 +127,7 @@ export const CARD_DATABASE: Record<string, Omit<Card, 'id' | 'currentDurability'
     useCount: 1,
     effect: '修复工具卡耐久'
   },
-  
+
   // 成品卡示例
   tomatoEgg: {
     cardType: 'product' as CardType,
@@ -204,25 +211,26 @@ async function loadCardsFromJSON(): Promise<void> {
       throw new Error('无法加载cards.json');
     }
     const data: CardDataFromJSON = await response.json();
-    
+
     // 清空缓存
     CARD_DATABASE_CACHE = {};
     CARD_KEY_TO_NAME_MAP = {};
     CARD_NAME_TO_KEY_MAP = {};
-    
+
     // 处理工具卡
     if (data.tools) {
       for (const tool of data.tools) {
-        const processingRules: ProcessingRules = {};
-        if (tool.processingRules) {
+        let processingRules: ProcessingRules | undefined;
+        if (tool.processingRules && Object.keys(tool.processingRules).length > 0) {
+          processingRules = {};
           processingRules[tool.name] = tool.processingRules;
         }
-        
+
         const trait = tool.trait ? {
           name: tool.trait.name,
           probability: tool.trait.probability,
           effect: tool.trait.effect,
-          handler: tool.trait.probability 
+          handler: tool.trait.probability
             ? (context: any) => {
                 if (Math.random() <= tool.trait!.probability!) {
                   return { effect: tool.trait!.effect };
@@ -231,7 +239,7 @@ async function loadCardsFromJSON(): Promise<void> {
               }
             : undefined
         } : undefined;
-        
+
         CARD_DATABASE_CACHE[tool.key] = {
           cardType: 'tool' as CardType,
           name: tool.name,
@@ -245,7 +253,7 @@ async function loadCardsFromJSON(): Promise<void> {
         CARD_NAME_TO_KEY_MAP[tool.name] = tool.key;
       }
     }
-    
+
     // 处理食材卡
     if (data.foods) {
       for (const food of data.foods) {
@@ -253,7 +261,7 @@ async function loadCardsFromJSON(): Promise<void> {
           name: food.trait.name,
           probability: food.trait.probability,
           effect: food.trait.effect,
-          handler: food.trait.probability 
+          handler: food.trait.probability
             ? (context: any) => {
                 if (Math.random() <= food.trait!.probability!) {
                   return { effect: food.trait!.effect };
@@ -262,7 +270,7 @@ async function loadCardsFromJSON(): Promise<void> {
               }
             : undefined
         } : undefined;
-        
+
         CARD_DATABASE_CACHE[food.key] = {
           cardType: 'food' as CardType,
           name: food.name,
@@ -275,7 +283,7 @@ async function loadCardsFromJSON(): Promise<void> {
         CARD_NAME_TO_KEY_MAP[food.name] = food.key;
       }
     }
-    
+
     // 处理辅料卡
     if (data.auxiliaries) {
       for (const aux of data.auxiliaries) {
@@ -291,7 +299,7 @@ async function loadCardsFromJSON(): Promise<void> {
         CARD_NAME_TO_KEY_MAP[aux.name] = aux.key;
       }
     }
-    
+
     // 处理特殊卡
     if (data.specials) {
       for (const special of data.specials) {
@@ -299,7 +307,7 @@ async function loadCardsFromJSON(): Promise<void> {
           name: special.trait.name,
           probability: special.trait.probability,
           effect: special.trait.effect,
-          handler: special.trait.probability 
+          handler: special.trait.probability
             ? (context: any) => {
                 if (Math.random() <= special.trait!.probability!) {
                   return { effect: special.trait!.effect };
@@ -308,7 +316,7 @@ async function loadCardsFromJSON(): Promise<void> {
               }
             : undefined
         } : undefined;
-        
+
         CARD_DATABASE_CACHE[special.key] = {
           cardType: 'special' as CardType,
           name: special.name,
@@ -359,13 +367,13 @@ export function createCard(cardKey: string): Card | null {
   const cardDatabase = getCardDatabase();
   const cardData = cardDatabase[cardKey];
   if (!cardData) return null;
-  
+
   // 构建processingRules
   let processingRules: ProcessingRules | undefined;
   if (cardData.processingRules) {
     processingRules = cardData.processingRules;
   }
-  
+
   return new Card(
     cardData.cardType,
     cardData.name,
@@ -402,7 +410,7 @@ export function getAllAvailableCardKeys(): string[] {
 export function getRandomCardKeys(count: number): string[] {
   const availableKeys = getAllAvailableCardKeys();
   if (availableKeys.length === 0) return [];
-  
+
   const shuffled = [...availableKeys].sort(() => Math.random() - 0.5);
   return shuffled.slice(0, Math.min(count, shuffled.length));
 }

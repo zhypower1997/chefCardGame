@@ -28,7 +28,11 @@ export default function GameBoard() {
       initializeCards(),
       initializeRecipes(),
       initializeExploreDrops()
-    ]).catch(err => {
+    ]).then(() => {
+      // JSON加载完成后，重新初始化玩家卡片以确保使用最新的卡片数据
+      gameManager.reinitializePlayerCards();
+      updateGameState();
+    }).catch(err => {
       console.error('加载配置失败:', err);
     });
   }, []);
@@ -155,7 +159,7 @@ export default function GameBoard() {
               {/* 左侧：玩家状态和任务 */}
               <div className="space-y-4">
                 <PlayerStatus player={gameState.player} synthesizer={gameState.synthesizer} />
-                <TaskPanel 
+                <TaskPanel
                   task={gameState.player.currentTask}
                   threat={gameState.player.currentThreat}
                 />
