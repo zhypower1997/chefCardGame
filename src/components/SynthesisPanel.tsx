@@ -27,37 +27,21 @@ export function SynthesisPanel({
   };
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">合成器</h2>
-      
-      {/* 能量显示 */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-gray-700 font-semibold">能量值</span>
-          <span className="text-lg font-bold text-blue-600">
-            {synthesizer.energy}/{synthesizer.maxEnergy}
-          </span>
-        </div>
-        <div className="w-full bg-gray-200 rounded-full h-4">
-          <div
-            className="bg-blue-500 h-4 rounded-full transition-all"
-            style={{ width: `${(synthesizer.energy / synthesizer.maxEnergy) * 100}%` }}
-          />
-        </div>
-      </div>
+    <div className="bg-white rounded-lg p-4 shadow-lg h-full flex flex-col">
+      <h2 className="text-xl font-bold mb-3 text-gray-800">合成器</h2>
 
       {/* 分步合成 */}
-      <div className="mb-6">
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">分步合成</h3>
+      <div className="mb-4 flex-1">
+        <h3 className="text-base font-semibold mb-2 text-gray-700">分步合成</h3>
         
         {/* 步骤选择 */}
-        <div className="flex gap-2 mb-3">
+        <div className="flex gap-1.5 mb-2">
           {(['preprocess', 'cook', 'season'] as SynthesisStep[]).map((step) => (
             <button
               key={step}
               onClick={() => onStepChange(step)}
               className={`
-                flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all
+                flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-all
                 ${synthesisStep === step
                   ? 'bg-blue-500 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
@@ -70,7 +54,7 @@ export function SynthesisPanel({
         </div>
 
         {/* 当前步骤说明 */}
-        <div className="bg-blue-50 p-3 rounded-lg mb-3 text-sm text-gray-700">
+        <div className="bg-blue-50 p-2 rounded-lg mb-2 text-xs text-gray-700">
           {synthesisStep === 'preprocess' && (
             <p>需要：刀 + 食材卡</p>
           )}
@@ -86,7 +70,7 @@ export function SynthesisPanel({
           onClick={onStepSynthesis}
           disabled={!synthesizer.hasEnergy(1) || selectedCards.length === 0}
           className={`
-            w-full py-3 rounded-lg font-semibold transition-all
+            w-full py-2 rounded-lg font-semibold transition-all text-sm
             ${synthesizer.hasEnergy(1) && selectedCards.length > 0
               ? 'bg-blue-500 text-white hover:bg-blue-600'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -99,10 +83,10 @@ export function SynthesisPanel({
 
       {/* 全丢合成 */}
       <div>
-        <h3 className="text-lg font-semibold mb-3 text-gray-700">全丢合成</h3>
-        <div className="bg-yellow-50 p-3 rounded-lg mb-3 text-sm text-gray-700">
-          <p className="font-semibold text-yellow-800 mb-1">⚠️ 风险提示：</p>
-          <ul className="list-disc list-inside space-y-1 text-xs">
+        <h3 className="text-base font-semibold mb-2 text-gray-700">全丢合成</h3>
+        <div className="bg-yellow-50 p-2 rounded-lg mb-2 text-xs text-gray-700">
+          <p className="font-semibold text-yellow-800 mb-0.5">⚠️ 风险提示：</p>
+          <ul className="list-disc list-inside space-y-0.5">
             <li>工具卡耐久-2（双倍消耗）</li>
             <li>辅料卡直接销毁</li>
             <li>30%概率触发混乱烹饪</li>
@@ -112,7 +96,7 @@ export function SynthesisPanel({
           onClick={onFullThrowSynthesis}
           disabled={!synthesizer.hasEnergy(1) || selectedCards.length === 0}
           className={`
-            w-full py-3 rounded-lg font-semibold transition-all
+            w-full py-2 rounded-lg font-semibold transition-all text-sm
             ${synthesizer.hasEnergy(1) && selectedCards.length > 0
               ? 'bg-orange-500 text-white hover:bg-orange-600'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -124,7 +108,7 @@ export function SynthesisPanel({
       </div>
 
       {/* 已选卡牌数量 */}
-      <div className="mt-4 text-center text-sm text-gray-600">
+      <div className="mt-3 text-center text-xs text-gray-600">
         已选择 {selectedCards.length} 张卡牌
       </div>
     </div>

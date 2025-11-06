@@ -67,7 +67,8 @@ export class Card {
 
   // 消耗耐久度
   consumeDurability(amount: number = 1): void {
-    if (this.cardType === 'tool') {
+    // 工具卡和火源（特殊工具）都可以消耗耐久度
+    if (this.cardType === 'tool' || (this.cardType === 'special' && this.name === '火源')) {
       this.currentDurability = Math.max(0, this.currentDurability - amount);
     }
   }

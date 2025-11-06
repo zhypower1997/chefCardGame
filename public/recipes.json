@@ -46,6 +46,14 @@
     "baseTradeValue": 1
   },
   {
+    "id": "radish-chunk-only",
+    "name": "萝卜块料理",
+    "requiredIngredients": ["萝卜块"],
+    "baseQuality": "normal",
+    "baseHealValue": 2,
+    "baseTradeValue": 1
+  },
+  {
     "id": "mixed",
     "name": "混合料理",
     "requiredIngredients": [],
@@ -54,4 +62,3 @@
     "baseTradeValue": 1
   }
 ]
-

@@ -49,36 +49,37 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
   return (
     <div
       className={`
-        relative border-2 rounded-lg p-3 cursor-pointer transition-all
+        relative border-2 rounded-lg p-1.5 cursor-pointer transition-all
         ${getCardColor()}
-        ${isSelected ? 'ring-4 ring-yellow-400 scale-105' : 'hover:scale-105'}
+        ${isSelected ? 'ring-2 ring-yellow-400 scale-[1.03] z-50 shadow-lg' : 'hover:scale-[1.02] z-10'}
       `}
+      style={{ transformOrigin: 'center center' }}
       onClick={onSelect}
     >
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="font-bold text-lg text-gray-800">
+      <div className="flex justify-between items-start mb-1">
+        <h3 className="font-bold text-sm text-gray-800 leading-tight">
           {card.name}
         </h3>
-        <span className="text-xs bg-white px-2 py-1 rounded text-gray-600">
+        <span className="text-xs bg-white px-1 py-0.5 rounded text-gray-600 leading-tight">
           {getCardTypeLabel()}
         </span>
       </div>
 
       {/* 工具卡耐久度 */}
       {card.cardType === 'tool' && (
-        <div className="text-sm text-gray-600 mb-1">
+        <div className="text-xs text-gray-600 mb-0.5">
           耐久: {card.currentDurability}/{card.maxDurability}
         </div>
       )}
 
       {/* 食材变质回合 */}
       {card.cardType === 'food' && (
-        <div className="space-y-1">
-          <div className={`text-sm ${card.isSpoiled() ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
+        <div className="space-y-0.5">
+          <div className={`text-xs ${card.isSpoiled() ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
             {card.isSpoiled() ? '已变质' : `剩余: ${card.remainingSpoil}回合`}
           </div>
           {card.isPreprocessed && (
-            <div className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-semibold">
+            <div className="text-xs bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-semibold">
               ✂️ 已预处理
             </div>
           )}
@@ -87,33 +88,33 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
 
       {/* 辅料使用次数 */}
       {card.cardType === 'auxiliary' && (
-        <div className="text-sm text-gray-600 mb-1">
+        <div className="text-xs text-gray-600 mb-0.5">
           使用次数: {card.useCount}
         </div>
       )}
 
       {/* 特性 */}
       {card.trait && (
-        <div className="text-xs text-purple-600 mb-1">
+        <div className="text-xs text-purple-600 mb-0.5 leading-tight">
           ✨ {card.trait.name}
         </div>
       )}
 
       {/* 效果描述 */}
       {card.effect && (
-        <div className="text-xs text-gray-500 mb-1">
+        <div className="text-xs text-gray-500 mb-0.5 leading-tight line-clamp-2">
           {card.effect}
         </div>
       )}
 
       {/* 成品卡属性 */}
       {card.cardType === 'product' && (
-        <div className="text-xs text-gray-600 space-y-1">
+        <div className="text-xs text-gray-600 space-y-0.5">
           {card.healValue && (
             <div>回复: {card.healValue} 饥饿</div>
           )}
           {card.buffEffect && (
-            <div className="text-orange-600">💫 {card.buffEffect}</div>
+            <div className="text-orange-600 line-clamp-1">💫 {card.buffEffect}</div>
           )}
           {card.tradeValue && (
             <div>交易价值: {card.tradeValue}</div>
@@ -122,7 +123,7 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
       )}
 
       {/* 操作按钮区域 */}
-      <div className="mt-2 space-y-1">
+      <div className="mt-1 space-y-0.5">
         {/* 使用按钮（成品卡和可使用的特殊卡） */}
         {(card.cardType === 'product' || 
           (card.cardType === 'special' && (card.name === '燃料卡' || card.name === '诱饵卡' || card.name === '修复卡'))) && (
@@ -131,14 +132,14 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
               e.stopPropagation();
               onUse();
             }}
-            className="w-full bg-orange-500 text-white text-xs py-1 rounded hover:bg-orange-600"
+            className="w-full bg-orange-500 text-white text-xs py-0.5 rounded hover:bg-orange-600"
           >
             使用
           </button>
         )}
 
         {/* 操作按钮组 */}
-        <div className="grid grid-cols-2 gap-1">
+        <div className="grid grid-cols-2 gap-0.5">
           {/* 丢弃按钮 */}
           {onDiscard && (
             <button
@@ -147,7 +148,7 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
                 e.preventDefault();
                 onDiscard();
               }}
-              className="bg-gray-400 text-white text-xs py-1 rounded hover:bg-gray-500"
+              className="bg-gray-400 text-white text-xs py-0.5 rounded hover:bg-gray-500"
             >
               丢弃
             </button>
@@ -168,7 +169,7 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
                   onSell();
                 }
               }}
-              className="bg-green-500 text-white text-xs py-1 rounded hover:bg-green-600"
+              className="bg-green-500 text-white text-xs py-0.5 rounded hover:bg-green-600"
             >
               售卖
             </button>
@@ -178,7 +179,7 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
 
       {/* 选中标记 */}
       {isSelected && (
-        <div className="absolute top-1 right-1 w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+        <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
           <span className="text-white text-xs font-bold">✓</span>
         </div>
       )}

@@ -9,23 +9,23 @@ interface PlayerStatusProps {
 
 export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
   return (
-    <div className="bg-white rounded-lg p-6 shadow-lg">
-      <h2 className="text-2xl font-bold mb-4 text-gray-800">玩家状态</h2>
+    <div className="bg-white rounded-lg p-3 shadow-lg">
+      <h2 className="text-lg font-bold mb-2 text-gray-800">玩家状态</h2>
       
       {/* 生命值 */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-gray-700 font-semibold">❤️ 生命值</span>
-          <span className={`text-lg font-bold ${
+      <div className="mb-2">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-gray-700 font-semibold text-sm">❤️ 生命值</span>
+          <span className={`text-base font-bold ${
             player.health <= 3 ? 'text-red-600' : 
             player.health <= 6 ? 'text-orange-600' : 'text-green-600'
           }`}>
             {player.health}/{player.maxHealth}
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-4">
+        <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className={`h-4 rounded-full transition-all ${
+            className={`h-2 rounded-full transition-all ${
               player.health <= 3 ? 'bg-red-500' : 
               player.health <= 6 ? 'bg-orange-500' : 'bg-green-500'
             }`}
@@ -35,19 +35,19 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
       </div>
 
       {/* 饥饿值 */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-gray-700 font-semibold">🍖 饥饿值</span>
-          <span className={`text-lg font-bold ${
+      <div className="mb-2">
+        <div className="flex justify-between items-center mb-1">
+          <span className="text-gray-700 font-semibold text-sm">🍖 饥饿值</span>
+          <span className={`text-base font-bold ${
             player.hunger === 0 ? 'text-red-600' : 
             player.hunger <= 3 ? 'text-orange-600' : 'text-green-600'
           }`}>
             {player.hunger}/{player.maxHunger}
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-4">
+        <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className={`h-4 rounded-full transition-all ${
+            className={`h-2 rounded-full transition-all ${
               player.hunger === 0 ? 'bg-red-500' : 
               player.hunger <= 3 ? 'bg-orange-500' : 'bg-green-500'
             }`}
@@ -55,19 +55,19 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
           />
         </div>
         {player.hunger === 0 && (
-          <p className="text-xs text-red-600 mt-1">⚠️ 饥饿值为0，每回合扣1生命值</p>
+          <p className="text-xs text-red-600 mt-0.5">⚠️ 饥饿值为0，每回合扣1生命值</p>
         )}
       </div>
 
       {/* Buff效果 */}
       {player.buffs.length > 0 && (
-        <div className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2">💫 Buff效果</h3>
-          <div className="space-y-1">
+        <div className="mb-2">
+          <h3 className="text-xs font-semibold text-gray-700 mb-1">💫 Buff效果</h3>
+          <div className="space-y-0.5">
             {player.buffs.map((buff, index) => (
-              <div key={index} className="bg-purple-50 p-2 rounded text-sm">
+              <div key={index} className="bg-purple-50 p-1 rounded text-xs">
                 <span className="font-medium">{buff.name}</span>
-                <span className="text-gray-600 ml-2">剩余 {buff.remainingTurns} 回合</span>
+                <span className="text-gray-600 ml-1">剩余 {buff.remainingTurns} 回合</span>
               </div>
             ))}
           </div>
@@ -75,38 +75,38 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
       )}
 
       {/* 金币 */}
-      <div className="mb-4">
-        <div className="flex justify-between items-center mb-2">
-          <span className="text-gray-700 font-semibold">💰 金币</span>
-          <span className="text-lg font-bold text-yellow-600">
+      <div className="mb-2">
+        <div className="flex justify-between items-center">
+          <span className="text-gray-700 font-semibold text-sm">💰 金币</span>
+          <span className="text-base font-bold text-yellow-600">
             {player.coins}
           </span>
         </div>
       </div>
 
       {/* 卡牌统计 */}
-      <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="bg-blue-50 p-2 rounded">
-          <div className="font-semibold text-blue-700">工具</div>
-          <div className="text-2xl font-bold text-blue-600">
+      <div className="grid grid-cols-2 gap-1.5 text-xs">
+        <div className="bg-blue-50 p-1.5 rounded">
+          <div className="font-semibold text-blue-700 text-xs">工具</div>
+          <div className="text-xl font-bold text-blue-600">
             {player.getCardsByType('tool').length}
           </div>
         </div>
-        <div className="bg-green-50 p-2 rounded">
-          <div className="font-semibold text-green-700">食材</div>
-          <div className="text-2xl font-bold text-green-600">
+        <div className="bg-green-50 p-1.5 rounded">
+          <div className="font-semibold text-green-700 text-xs">食材</div>
+          <div className="text-xl font-bold text-green-600">
             {player.getCardsByType('food').length}
           </div>
         </div>
-        <div className="bg-yellow-50 p-2 rounded">
-          <div className="font-semibold text-yellow-700">辅料</div>
-          <div className="text-2xl font-bold text-yellow-600">
+        <div className="bg-yellow-50 p-1.5 rounded">
+          <div className="font-semibold text-yellow-700 text-xs">辅料</div>
+          <div className="text-xl font-bold text-yellow-600">
             {player.getCardsByType('auxiliary').length}
           </div>
         </div>
-        <div className="bg-orange-50 p-2 rounded">
-          <div className="font-semibold text-orange-700">成品</div>
-          <div className="text-2xl font-bold text-orange-600">
+        <div className="bg-orange-50 p-1.5 rounded">
+          <div className="font-semibold text-orange-700 text-xs">成品</div>
+          <div className="text-xl font-bold text-orange-600">
             {player.getCardsByType('product').length}
           </div>
         </div>

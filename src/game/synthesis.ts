@@ -61,7 +61,7 @@ export class SynthesisEngine {
   // 预处理步骤（食材加工）
   private preprocessStep(cards: Card[]): SynthesisResult {
     const toolCards = cards.filter(c => c.cardType === 'tool' && c.isUsable());
-    const foodCards = cards.filter(c => c.cardType === 'food');
+    const foodCards = cards.filter(c => c.cardType === 'food' && !c.isSpoiled());
 
     if (toolCards.length === 0) {
       return {
@@ -73,6 +73,16 @@ export class SynthesisEngine {
     }
 
     if (foodCards.length === 0) {
+      // 检查是否有变质食材
+      const spoiledFood = cards.filter(c => c.cardType === 'food' && c.isSpoiled());
+      if (spoiledFood.length > 0) {
+        return {
+          success: false,
+          message: '变质的食材无法进行预处理',
+          consumedCards: [],
+          quality: 'normal'
+        };
+      }
       return {
         success: false,
         message: '需要食材进行预处理',
@@ -217,7 +227,7 @@ export class SynthesisEngine {
   private cookStep(cards: Card[]): SynthesisResult {
     const potCard = cards.find(c => c.cardType === 'tool' && c.name === '锅');
     const fireCard = cards.find(c => c.name === '火源');
-    const preprocessedFood = cards.filter(c => c.isPreprocessedFood());
+    const preprocessedFood = cards.filter(c => c.isPreprocessedFood() && !c.isSpoiled());
 
     if (!potCard || !potCard.isUsable()) {
       return {
@@ -237,7 +247,27 @@ export class SynthesisEngine {
       };
     }
 
+    // 检查火源是否有燃料
+    if (fireCard.currentDurability <= 0) {
+      return {
+        success: false,
+        message: '火源燃料不足，无法进行烹饪（需要先使用燃料卡补充燃料）',
+        consumedCards: [],
+        quality: 'normal'
+      };
+    }
+
     if (preprocessedFood.length === 0) {
+      // 检查是否有变质的预处理食材
+      const spoiledPreprocessed = cards.filter(c => c.isPreprocessedFood() && c.isSpoiled());
+      if (spoiledPreprocessed.length > 0) {
+        return {
+          success: false,
+          message: '变质的食材无法进行料理',
+          consumedCards: [],
+          quality: 'normal'
+        };
+      }
       return {
         success: false,
         message: '需要预处理过的食材',
@@ -249,11 +279,8 @@ export class SynthesisEngine {
     // 消耗工具耐久
     potCard.consumeDurability(1);
 
-    // 消耗火源燃料（如果有燃料卡）
-    const fuelCard = cards.find(c => c.name === '燃料卡');
-    if (fuelCard) {
-      fuelCard.consumeUse();
-    }
+    // 消耗火源燃料（每烹饪一次消耗1点燃料）
+    fireCard.consumeDurability(1);
 
     // 触发特性
     const traitTriggers: Array<{ cardName: string; traitName: string; effect: any }> = [];
@@ -275,7 +302,7 @@ export class SynthesisEngine {
       success: true,
       message: '烹饪完成',
       productCard,
-      consumedCards: [potCard, fireCard, ...preprocessedFood, ...(fuelCard ? [fuelCard] : [])],
+      consumedCards: [potCard, fireCard, ...preprocessedFood],
       traitTriggers,
       quality: productCard ? this.calculateQuality(preprocessedFood, potCard, cards) : 'normal'
     };
@@ -345,15 +372,30 @@ export class SynthesisEngine {
     // 自动过滤无关卡并排序
     const filteredCards = this.filterAndSortCards(cards);
 
+    // 过滤掉变质食材
+    const validCards = filteredCards.filter(c => !(c.cardType === 'food' && c.isSpoiled()));
+
+    // 检查是否有变质食材（用于错误提示）
+    const spoiledFood = filteredCards.filter(c => c.cardType === 'food' && c.isSpoiled());
+
     // 检查必选卡
-    const hasPot = filteredCards.some(c => c.cardType === 'tool' && c.name === '锅');
-    const hasFire = filteredCards.some(c => c.name === '火源');
-    const hasFood = filteredCards.some(c => c.cardType === 'food');
-    const hasTool = filteredCards.some(c => c.cardType === 'tool' && c.name === '刀');
+    const hasPot = validCards.some(c => c.cardType === 'tool' && c.name === '锅');
+    const hasFire = validCards.some(c => c.name === '火源');
+    const hasFood = validCards.some(c => c.cardType === 'food');
+    const hasTool = validCards.some(c => c.cardType === 'tool' && c.name === '刀');
 
     if (!hasPot || !hasFire || !hasFood) {
       // 合成失败，消耗能量
       this.synthesizer.consumeEnergy(1);
+      // 如果有变质食材，给出更明确的错误提示
+      if (spoiledFood.length > 0) {
+        return {
+          success: false,
+          message: '变质的食材无法进行料理',
+          consumedCards: [],
+          quality: 'normal'
+        };
+      }
       return {
         success: false,
         message: '必选卡缺失（需要：锅、火源、食材）',
@@ -374,7 +416,7 @@ export class SynthesisEngine {
       chaosEffect = true;
       chaosMessage = '触发混乱烹饪！';
       // 1-2张食材卡消失
-      const foodCards = filteredCards.filter(c => c.cardType === 'food');
+      const foodCards = validCards.filter(c => c.cardType === 'food');
       const removeCount = Math.min(foodCards.length, Math.floor(Math.random() * 2) + 1);
       for (let i = 0; i < removeCount; i++) {
         const index = Math.floor(Math.random() * foodCards.length);
@@ -384,11 +426,11 @@ export class SynthesisEngine {
     }
 
     // 执行全流程（双倍消耗工具卡）
-    const toolCards = filteredCards.filter(c => c.cardType === 'tool');
+    const toolCards = validCards.filter(c => c.cardType === 'tool');
     toolCards.forEach(tool => tool.consumeDurability(2));
 
     // 辅料卡直接销毁
-    const auxiliaryCards = filteredCards.filter(c => c.cardType === 'auxiliary');
+    const auxiliaryCards = validCards.filter(c => c.cardType === 'auxiliary');
     auxiliaryCards.forEach(aux => {
       if (aux.name === '油') {
         aux.useCount = 0;
@@ -398,11 +440,11 @@ export class SynthesisEngine {
     });
 
     // 生成成品
-    const foodCards = filteredCards.filter(c => c.cardType === 'food');
+    const foodCards = validCards.filter(c => c.cardType === 'food');
     const traitTriggers: Array<{ cardName: string; traitName: string; effect: any }> = [];
 
     // 检查逗逗狐特性
-    const foxCard = filteredCards.find(c => c.name === '逗逗狐');
+    const foxCard = validCards.find(c => c.name === '逗逗狐');
     if (foxCard) {
       const foxTrait = foxCard.triggerTrait({});
       if (foxTrait) {
@@ -414,10 +456,10 @@ export class SynthesisEngine {
       }
     }
 
-    const productCard = this.generateProduct(foodCards, filteredCards, traitTriggers, chaosEffect);
+    const productCard = this.generateProduct(foodCards, validCards, traitTriggers, chaosEffect);
 
     // 计算品质
-    let quality = this.calculateQuality(foodCards, toolCards[0], filteredCards, productCard);
+    let quality = this.calculateQuality(foodCards, toolCards[0], validCards, productCard);
     if (chaosEffect) {
       // 混乱烹饪品质-1
       if (quality === 'excellent') quality = 'fine';
@@ -428,7 +470,7 @@ export class SynthesisEngine {
       success: true,
       message: `全丢合成完成${chaosMessage ? '：' + chaosMessage : ''}`,
       productCard,
-      consumedCards: filteredCards,
+      consumedCards: validCards,
       traitTriggers,
       quality
     };

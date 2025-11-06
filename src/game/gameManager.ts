@@ -198,9 +198,18 @@ export class GameManager {
       // 为火源提供燃料
       const fireCard = this.player.getCardByName('火源');
       if (fireCard) {
+        // 增加火源的耐久度（燃料值），最多增加到最大耐久度
+        const fuelAmount = 3; // 每张燃料卡增加3点燃料
+        fireCard.currentDurability = Math.min(
+          fireCard.maxDurability,
+          fireCard.currentDurability + fuelAmount
+        );
         // 消耗燃料卡
         this.player.removeCard(cardId);
-        return { success: true, message: '燃料卡已使用，火源已补充燃料' };
+        return {
+          success: true,
+          message: `燃料卡已使用，火源燃料值已增加到 ${fireCard.currentDurability}/${fireCard.maxDurability}`
+        };
       } else {
         return { success: false, message: '需要火源卡才能使用燃料卡' };
       }

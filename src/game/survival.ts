@@ -252,6 +252,12 @@ export class SurvivalManager {
       }
     });
 
+    // 消耗火源燃料（每回合消耗1点，如果火源存在且燃料值>0）
+    const fireCard = this.player.getCardByName('火源');
+    if (fireCard && fireCard.currentDurability > 0) {
+      fireCard.consumeDurability(1);
+    }
+
     // 更新buff
     this.player.updateBuffs();
 
