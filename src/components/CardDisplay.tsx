@@ -77,11 +77,6 @@ export function CardDisplay({
           {getCardTypeLabel()}
         </span>
       </div>
-      {/* 图片 */}
-      {console.log(
-        '`/assets/images/${card.cardType}/${card.name}.png`',
-        `/cards/${card.cardType}/${card.name}.png`,
-      )}
       <div className="w-full h-20 mb-1 flex items-center justify-center">
         <img
           src={`/assets/images/${card.cardType}/${card.name}.png`}
