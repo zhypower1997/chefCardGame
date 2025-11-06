@@ -47,11 +47,35 @@
   },
   {
     "id": "radish-chunk-only",
-    "name": "萝卜块料理",
+    "name": "煮萝卜",
     "requiredIngredients": ["萝卜块"],
     "baseQuality": "normal",
     "baseHealValue": 2,
     "baseTradeValue": 1
+  },
+  {
+    "id": "radish-chunk-only",
+    "name": "煮萝卜",
+    "requiredIngredients": ["萝卜片"],
+    "baseQuality": "normal",
+    "baseHealValue": 2,
+    "baseTradeValue": 1
+  },
+   {
+    "id": "radish-splash",
+    "name": "炒萝卜丝",
+    "requiredIngredients": ["萝卜丝"],
+    "baseQuality": "normal",
+    "baseHealValue": 2,
+    "baseTradeValue": 1
+  },
+  {
+    "id": "radish-egg",
+    "name": "萝卜炒鸡蛋",
+    "requiredIngredients": ["萝卜块", "鸡蛋"],
+    "baseQuality": "normal",
+    "baseHealValue": 2,
+    "baseTradeValue": 4
   },
   {
     "id": "mixed",

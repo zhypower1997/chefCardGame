@@ -11,13 +11,22 @@ interface CardDisplayProps {
   onSell?: () => void;
 }
 
-export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSell }: CardDisplayProps) {
+export function CardDisplay({
+  card,
+  isSelected,
+  onSelect,
+  onUse,
+  onDiscard,
+  onSell,
+}: CardDisplayProps) {
   const getCardColor = () => {
     switch (card.cardType) {
       case 'tool':
         return 'bg-blue-100 border-blue-400';
       case 'food':
-        return card.isSpoiled() ? 'bg-gray-300 border-gray-500' : 'bg-green-100 border-green-400';
+        return card.isSpoiled()
+          ? 'bg-gray-300 border-gray-500'
+          : 'bg-green-100 border-green-400';
       case 'auxiliary':
         return 'bg-yellow-100 border-yellow-400';
       case 'special':
@@ -51,7 +60,11 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
       className={`
         relative border-2 rounded-lg p-1.5 cursor-pointer transition-all
         ${getCardColor()}
-        ${isSelected ? 'ring-2 ring-yellow-400 scale-[1.03] z-50 shadow-lg' : 'hover:scale-[1.02] z-10'}
+        ${
+          isSelected
+            ? 'ring-2 ring-yellow-400 scale-[1.03] z-50 shadow-lg'
+            : 'hover:scale-[1.02] z-10'
+        }
       `}
       style={{ transformOrigin: 'center center' }}
       onClick={onSelect}
@@ -64,6 +77,18 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
           {getCardTypeLabel()}
         </span>
       </div>
+      {/* 图片 */}
+      {console.log(
+        '`/assets/images/${card.cardType}/${card.name}.png`',
+        `/cards/${card.cardType}/${card.name}.png`,
+      )}
+      <div className="w-full h-20 mb-1 flex items-center justify-center">
+        <img
+          src={`/assets/images/${card.cardType}/${card.name}.png`}
+          alt={card.name}
+          className="max-h-full max-w-full object-contain"
+        />
+      </div>
 
       {/* 工具卡耐久度 */}
       {card.cardType === 'tool' && (
@@ -75,7 +100,11 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
       {/* 食材变质回合 */}
       {card.cardType === 'food' && (
         <div className="space-y-0.5">
-          <div className={`text-xs ${card.isSpoiled() ? 'text-red-600 font-bold' : 'text-gray-600'}`}>
+          <div
+            className={`text-xs ${
+              card.isSpoiled() ? 'text-red-600 font-bold' : 'text-gray-600'
+            }`}
+          >
             {card.isSpoiled() ? '已变质' : `剩余: ${card.remainingSpoil}回合`}
           </div>
           {card.isPreprocessed && (
@@ -102,22 +131,30 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
 
       {/* 效果描述 */}
       {card.effect && (
-        <div className="text-xs text-gray-500 mb-0.5 leading-tight line-clamp-2">
-          {card.effect}
+        <div className="text-xs mb-0.5 leading-tight">
+          <span className="inline-block bg-white text-gray-700 px-1 py-0.5 rounded font-medium">
+            💡 {card.effect}
+          </span>
         </div>
       )}
 
       {/* 成品卡属性 */}
       {card.cardType === 'product' && (
-        <div className="text-xs text-gray-600 space-y-0.5">
+        <div className="text-xs space-y-0.5">
           {card.healValue && (
-            <div>回复: {card.healValue} 饥饿</div>
+            <div className="bg-green-100 text-green-700 px-1 py-0.5 rounded font-medium">
+              🍽️ 回复: {card.healValue} 饥饿
+            </div>
           )}
           {card.buffEffect && (
-            <div className="text-orange-600 line-clamp-1">💫 {card.buffEffect}</div>
+            <div className="bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-medium line-clamp-1">
+              💫 {card.buffEffect}
+            </div>
           )}
           {card.tradeValue && (
-            <div>交易价值: {card.tradeValue}</div>
+            <div className="bg-yellow-100 text-yellow-700 px-1 py-0.5 rounded font-medium">
+              💰 交易价值: {card.tradeValue}
+            </div>
           )}
         </div>
       )}
@@ -125,8 +162,11 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
       {/* 操作按钮区域 */}
       <div className="mt-1 space-y-0.5">
         {/* 使用按钮（成品卡和可使用的特殊卡） */}
-        {(card.cardType === 'product' || 
-          (card.cardType === 'special' && (card.name === '燃料卡' || card.name === '诱饵卡' || card.name === '修复卡'))) && (
+        {(card.cardType === 'product' ||
+          (card.cardType === 'special' &&
+            (card.name === '燃料卡' ||
+              card.name === '诱饵卡' ||
+              card.name === '修复卡'))) && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -159,13 +199,26 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                const price = card.tradeValue || 
-                  (card.cardType === 'tool' ? card.currentDurability * 2 :
-                   card.cardType === 'food' ? (card.isSpoiled() ? 0 : 1) :
-                   card.cardType === 'auxiliary' ? card.useCount :
-                   card.cardType === 'special' ? (card.name === '逗逗狐' ? 5 : 1) :
-                   card.cardType === 'product' ? 1 : 0);
-                if (confirm(`确定要以 ${price} 金币的价格售出 ${card.name} 吗？`)) {
+                const price =
+                  card.tradeValue ||
+                  (card.cardType === 'tool'
+                    ? card.currentDurability * 2
+                    : card.cardType === 'food'
+                    ? card.isSpoiled()
+                      ? 0
+                      : 1
+                    : card.cardType === 'auxiliary'
+                    ? card.useCount
+                    : card.cardType === 'special'
+                    ? card.name === '逗逗狐'
+                      ? 5
+                      : 1
+                    : card.cardType === 'product'
+                    ? 1
+                    : 0);
+                if (
+                  confirm(`确定要以 ${price} 金币的价格售出 ${card.name} 吗？`)
+                ) {
                   onSell();
                 }
               }}
@@ -186,4 +239,3 @@ export function CardDisplay({ card, isSelected, onSelect, onUse, onDiscard, onSe
     </div>
   );
 }
-

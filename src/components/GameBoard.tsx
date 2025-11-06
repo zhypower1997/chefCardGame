@@ -17,7 +17,8 @@ export default function GameBoard() {
   const [gameManager] = useState(() => new GameManager());
   const [gameState, setGameState] = useState(gameManager.getGameState());
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
-  const [synthesisStep, setSynthesisStep] = useState<SynthesisStep>('preprocess');
+  const [synthesisStep, setSynthesisStep] =
+    useState<SynthesisStep>('preprocess');
   const [message, setMessage] = useState<string>('');
   const [showExplore, setShowExplore] = useState(false);
   const [showShop, setShowShop] = useState(false);
@@ -27,14 +28,16 @@ export default function GameBoard() {
     Promise.all([
       initializeCards(),
       initializeRecipes(),
-      initializeExploreDrops()
-    ]).then(() => {
-      // JSON加载完成后，重新初始化玩家卡片以确保使用最新的卡片数据
-      gameManager.reinitializePlayerCards();
-      updateGameState();
-    }).catch(err => {
-      console.error('加载配置失败:', err);
-    });
+      initializeExploreDrops(),
+    ])
+      .then(() => {
+        // JSON加载完成后，重新初始化玩家卡片以确保使用最新的卡片数据
+        gameManager.reinitializePlayerCards();
+        updateGameState();
+      })
+      .catch((err) => {
+        console.error('加载配置失败:', err);
+      });
   }, []);
 
   const updateGameState = () => {
@@ -42,9 +45,9 @@ export default function GameBoard() {
   };
 
   const handleCardSelect = (cardId: string) => {
-    setSelectedCards(prev => {
+    setSelectedCards((prev) => {
       if (prev.includes(cardId)) {
-        return prev.filter(id => id !== cardId);
+        return prev.filter((id) => id !== cardId);
       }
       return [...prev, cardId];
     });
@@ -56,7 +59,10 @@ export default function GameBoard() {
       return;
     }
 
-    const result = gameManager.stepByStepSynthesis(selectedCards, synthesisStep);
+    const result = gameManager.stepByStepSynthesis(
+      selectedCards,
+      synthesisStep,
+    );
     setMessage(result.message);
     setSelectedCards([]);
     updateGameState();
@@ -85,7 +91,7 @@ export default function GameBoard() {
     if (success) {
       setMessage('卡牌已丢弃');
       // 如果丢弃的卡牌在选中列表中，移除它
-      setSelectedCards(prev => prev.filter(id => id !== cardId));
+      setSelectedCards((prev) => prev.filter((id) => id !== cardId));
     } else {
       setMessage('丢弃失败：卡牌不存在');
     }
@@ -110,7 +116,11 @@ export default function GameBoard() {
       setMessage('能量值不足，无法探索');
       return;
     }
-    setMessage(`探索成功！获得 ${cards.length} 张卡牌：${cards.map(c => c.name).join('、')}`);
+    setMessage(
+      `探索成功！获得 ${cards.length} 张卡牌：${cards
+        .map((c) => c.name)
+        .join('、')}`,
+    );
     setShowExplore(false);
     updateGameState();
   };
@@ -134,19 +144,30 @@ export default function GameBoard() {
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* 顶部标题栏 */}
         <div className="mb-2 flex justify-between items-center flex-shrink-0">
-          <h1 className="text-2xl font-bold text-orange-800">逗逗狐的合成厨房</h1>
+          <h1 className="text-2xl font-bold text-orange-800">
+            逗逗狐的合成厨房
+          </h1>
           <div className="flex items-center gap-4">
             {/* 能量值显示 */}
             <div className="bg-white rounded-lg px-4 py-2 shadow-md">
               <div className="flex items-center gap-3">
-                <span className="text-gray-700 font-semibold text-sm">能量值</span>
+                <span className="text-gray-700 font-semibold text-sm">
+                  能量值
+                </span>
                 <span className="text-base font-bold text-blue-600">
-                  {gameState.synthesizer.energy}/{gameState.synthesizer.maxEnergy}
+                  {gameState.synthesizer.energy}/
+                  {gameState.synthesizer.maxEnergy}
                 </span>
                 <div className="w-24 bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-blue-500 h-2 rounded-full transition-all"
-                    style={{ width: `${(gameState.synthesizer.energy / gameState.synthesizer.maxEnergy) * 100}%` }}
+                    style={{
+                      width: `${
+                        (gameState.synthesizer.energy /
+                          gameState.synthesizer.maxEnergy) *
+                        100
+                      }%`,
+                    }}
                   />
                 </div>
               </div>
@@ -188,7 +209,10 @@ export default function GameBoard() {
             <div className="flex-1 overflow-hidden flex gap-2 min-h-0">
               {/* 左侧：紧凑的玩家状态和任务 */}
               <div className="w-64 flex-shrink-0 flex flex-col gap-2 overflow-y-auto">
-                <PlayerStatus player={gameState.player} synthesizer={gameState.synthesizer} />
+                <PlayerStatus
+                  player={gameState.player}
+                  synthesizer={gameState.synthesizer}
+                />
                 <TaskPanel
                   task={gameState.player.currentTask}
                   threat={gameState.player.currentThreat}
@@ -227,10 +251,12 @@ export default function GameBoard() {
 
             {/* 卡牌展示区（最大） */}
             <div className="flex-1 min-h-0 flex flex-col bg-white rounded-lg p-3 shadow-lg">
-              <h2 className="text-xl font-bold mb-2 text-gray-800 flex-shrink-0">我的卡牌</h2>
+              <h2 className="text-xl font-bold mb-2 text-gray-800 flex-shrink-0">
+                我的卡牌
+              </h2>
               <div className="flex-1 overflow-y-auto overflow-x-hidden">
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 gap-1.5 p-2 relative">
-                  {gameState.player.cards.map(card => (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-10 xl:grid-cols-10 2xl:grid-cols-12 gap-1.5 p-2 relative">
+                  {gameState.player.cards.map((card) => (
                     <CardDisplay
                       key={card.id}
                       card={card}
@@ -260,4 +286,3 @@ export default function GameBoard() {
     </div>
   );
 }
-

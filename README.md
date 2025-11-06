@@ -1,36 +1,151 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🦊 逗逗狐的合成厨房
 
-## Getting Started
+一款融合卡牌合成、生存策略与料理制作的休闲游戏。在这个充满挑战的厨房世界中，你需要收集食材、管理资源、完成料理，努力在饥饿与威胁中生存下去！
 
-First, run the development server:
+## 🎮 游戏概述
+
+《逗逗狐的合成厨房》是一款策略卡牌游戏，玩家扮演一位在荒野中求生的厨师。通过收集各种食材卡牌、工具卡牌和辅料卡牌，使用合成系统制作料理，维持生命值并完成各种挑战任务。游戏融合了资源管理、策略规划和运气元素，每一局都是一次全新的生存冒险。
+
+## ✨ 核心玩法
+
+### 卡牌合成系统
+
+游戏的核心是**卡牌合成系统**，支持两种合成方式：
+
+#### 1. 分步合成（推荐）
+- **预处理步骤**：使用工具卡（如刀、擦丝器）加工食材，将原始食材加工成更高级的形态
+- **烹饪步骤**：使用锅和火源，将预处理过的食材烹饪成成品料理
+- **调味步骤**：使用辅料卡（盐、油、糖）提升成品品质和属性
+
+#### 2. 全丢合成（快速）
+- 一次性投入所有卡牌，自动完成整个合成流程
+- 消耗双倍工具耐久，但有30%概率触发"混乱烹饪"效果
+- 适合快速合成，但需要承担风险
+
+### 生存系统
+
+- **生命值**：生命值归零即游戏失败
+- **饥饿值**：每回合消耗2点饥饿值（拥有"饱腹"buff时免消耗）
+- **食材变质**：食材卡牌会随时间变质，变质食材无法使用
+- **工具耐久**：工具卡有使用次数限制，需要修复卡或替换
+
+### 任务与威胁系统
+
+- **日常任务**：每回合可能获得任务，如"制作热菜"、"制作无油料理"等，完成可获得奖励
+- **威胁事件**：30%概率触发威胁（如野兽来袭、商人订单、工具损坏），需要及时应对，否则会扣除生命值
+
+### 探索系统
+
+消耗能量值探索不同地点，获得随机卡牌：
+- **平原**：基础食材（番茄、鸡蛋、盐、萝卜）
+- **矿山**：燃料、修复卡
+- **森林**：燃料、油
+- **市场**：糖、油
+
+### 商店系统
+
+使用金币购买必要的工具和道具：
+- 刀、锅、火源等基础工具
+- 修复卡等消耗品
+
+## 🎯 游戏特色
+
+### 1. 丰富的食谱系统
+- 根据食材组合自动匹配对应食谱（如"番茄+鸡蛋"→"番茄炒蛋"）
+- 支持多种料理，每种料理都有独特的属性
+
+### 2. 品质分级系统
+- **普通品质**：基础属性
+- **精品品质**：回复值提升，附加"饱腹2回合"buff，交易价值翻倍
+- **极品品质**：更高回复值，附加"饱腹3回合+生命值+2"buff，交易价值三倍
+- 品质由食材新鲜度、工具状态、辅料使用和特性触发决定
+
+### 3. 卡牌特性系统
+- 每张卡牌可能有独特特性，如"双黄蛋"、"狐运"等
+- 特性触发会带来额外效果（如品质提升、双倍产出等）
+
+### 4. Buff系统
+- 通过食用料理获得各种buff效果
+- "饱腹"buff可以免饥饿消耗，是生存的关键
+
+### 5. 能量值管理
+- 合成和探索都需要消耗能量值
+- 每回合自动恢复，需要合理规划使用
+
+### 6. 策略深度
+- 食材变质管理：需要及时使用或丢弃变质食材
+- 工具耐久规划：合理分配工具使用，避免关键时刻工具损坏
+- 火源燃料管理：火源每回合消耗燃料，需要及时补充
+- 任务优先级：平衡任务奖励和生存需求
+
+## 🎨 游戏界面
+
+- 清爽的卡牌展示界面
+- 实时显示玩家状态（生命值、饥饿值、金币、能量值）
+- 清晰的任务和威胁提示
+- 直观的合成操作面板
+
+## 🚀 快速开始
+
+### 安装依赖
+
+```bash
+npm install
+# 或
+yarn install
+# 或
+pnpm install
+```
+
+### 运行开发服务器
 
 ```bash
 npm run dev
-# or
+# 或
 yarn dev
-# or
+# 或
 pnpm dev
-# or
+# 或
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+打开 [http://localhost:3000](http://localhost:3000) 开始游戏。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 构建生产版本
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## 📁 项目结构
 
-To learn more about Next.js, take a look at the following resources:
+- `src/game/` - 游戏核心逻辑（合成系统、生存系统）
+- `src/data/` - 游戏数据（卡牌、食谱、商店配置）
+- `src/components/` - React组件（游戏界面）
+- `public/` - 静态资源（JSON配置文件）
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🎲 游戏技巧
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **优先完成任务**：任务奖励往往能帮助度过难关
+2. **及时处理变质食材**：变质食材可以配合工具卡制作诱饵卡
+3. **合理使用能量值**：探索和合成都需要能量，需要平衡使用
+4. **保持火源燃料**：火源是制作热菜的关键，注意及时补充燃料
+5. **精品料理优先**：精品料理不仅能恢复更多，还能提供饱腹buff，是生存的关键
 
-## Deploy on Vercel
+## 🛠️ 技术栈
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- **框架**：Next.js (React)
+- **语言**：TypeScript
+- **样式**：Tailwind CSS
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📝 开发说明
+
+游戏数据通过JSON文件配置，可以轻松扩展：
+- `public/cards.json` - 卡牌配置
+- `public/recipes.json` - 食谱配置
+- `public/explore-drops.json` - 探索掉落配置
+
+---
+
+**祝你在逗逗狐的厨房中生存愉快！** 🍳✨
