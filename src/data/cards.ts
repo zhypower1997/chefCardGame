@@ -1,5 +1,11 @@
 import { Card, CardType, Trait, ProcessingRules } from '@/types/game';
 
+// 卡牌数据模板类型（只包含数据属性，不包含方法和实例特定字段）
+type CardDataTemplate = Omit<
+  Pick<Card, 'cardType' | 'name' | 'maxDurability' | 'trait' | 'spoilTurn' | 'useCount' | 'effect' | 'healValue' | 'buffEffect' | 'tradeValue' | 'processingRules'>,
+  never
+>;
+
 // 从JSON加载卡牌数据的接口
 interface CardDataFromJSON {
   tools?: Array<{
@@ -44,7 +50,7 @@ interface CardDataFromJSON {
 }
 
 // 卡牌数据缓存
-let CARD_DATABASE_CACHE: Record<string, Omit<Card, 'id' | 'currentDurability' | 'remainingSpoil'>> = {};
+let CARD_DATABASE_CACHE: Record<string, CardDataTemplate> = {};
 let CARD_KEY_TO_NAME_MAP: Record<string, string> = {}; // key -> name 映射
 let CARD_NAME_TO_KEY_MAP: Record<string, string> = {}; // name -> key 映射
 
@@ -186,7 +192,7 @@ export async function initializeCards(): Promise<void> {
 }
 
 // 获取卡牌数据库（同步）
-function getCardDatabase(): Record<string, Omit<Card, 'id' | 'currentDurability' | 'remainingSpoil'>> {
+function getCardDatabase(): Record<string, CardDataTemplate> {
   return CARD_DATABASE_CACHE;
 }
 

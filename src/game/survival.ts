@@ -65,7 +65,7 @@ export class TaskGenerator {
       case '合成品质为精品的料理':
         return lastSynthesis?.quality === 'fine' || lastSynthesis?.quality === 'excellent';
       case '使用未变质的食材合成':
-        return lastSynthesis?.consumedCards?.every((c: Card) => 
+        return lastSynthesis?.consumedCards?.every((c: Card) =>
           c.cardType !== 'food' || !c.isSpoiled()
         ) || false;
       default:
@@ -129,7 +129,7 @@ export class ThreatGenerator {
       case '需要诱饵卡':
         return player.getCardByName('诱饵卡') !== undefined;
       case '需要精品料理':
-        return player.cards.some(c => 
+        return player.cards.some(c =>
           c.cardType === 'product' && c.name.includes('精品')
         );
       case '需要修复卡':
@@ -151,10 +151,10 @@ async function loadExploreDropsFromJSON(): Promise<void> {
       throw new Error('无法加载explore-drops.json');
     }
     const data = await response.json();
-    
+
     // 清空缓存
     EXPLORE_DROPS_CACHE = {};
-    
+
     // 提取掉落列表
     for (const [location, locationData] of Object.entries(data)) {
       if (locationData && typeof locationData === 'object' && 'drops' in locationData) {
@@ -191,11 +191,11 @@ export class ExploreSystem {
   static explore(location: 'plain' | 'mine' | 'forest' | 'market' | string): Card[] {
     const drops = getExploreDrops(location);
     const cards: Card[] = [];
-    
+
     if (drops.length === 0) {
       return cards;
     }
-    
+
     // 随机获得1-2张卡牌
     const count = Math.floor(Math.random() * 2) + 1;
     for (let i = 0; i < count; i++) {
@@ -205,7 +205,7 @@ export class ExploreSystem {
         cards.push(card);
       }
     }
-    
+
     return cards;
   }
 }
@@ -268,7 +268,7 @@ export class SurvivalManager {
         this.player,
         this.lastSynthesisResult
       );
-      
+
       if (completed) {
         this.player.currentTask.completed = true;
         // 发放奖励
@@ -283,7 +283,8 @@ export class SurvivalManager {
           this.player.currentTask.remainingTurns -= 1;
           if (this.player.currentTask.remainingTurns <= 0) {
             // 任务失败，扣除生命值
-            this.player.health = Math.max(0, this.player.health - this.player.currentTask.penalty);
+            const penalty = this.player.currentTask.penalty ?? 0;
+            this.player.health = Math.max(0, this.player.health - penalty);
           }
         }
       }
@@ -311,7 +312,7 @@ export class SurvivalManager {
           const repairCard = this.player.getCardByName('修复卡');
           if (repairCard) this.player.removeCard(repairCard.id);
         } else if (this.player.currentThreat.requirement === '需要精品料理') {
-          const fineProduct = this.player.cards.find(c => 
+          const fineProduct = this.player.cards.find(c =>
             c.cardType === 'product' && c.name.includes('精品')
           );
           if (fineProduct) this.player.removeCard(fineProduct.id);
