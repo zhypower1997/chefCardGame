@@ -20,6 +20,7 @@ export default function GameBoard() {
   const [synthesisStep, setSynthesisStep] =
     useState<SynthesisStep>('preprocess');
   const [message, setMessage] = useState<string>('');
+  const [messageLog, setMessageLog] = useState<string[]>([]);
   const [showExplore, setShowExplore] = useState(false);
   const [showShop, setShowShop] = useState(false);
 
@@ -44,6 +45,13 @@ export default function GameBoard() {
     setGameState(gameManager.getGameState());
   };
 
+  const updateMessage = (newMessage: string) => {
+    setMessage(newMessage);
+    if (newMessage && newMessage.trim()) {
+      setMessageLog((prev) => [...prev, newMessage]);
+    }
+  };
+
   const handleCardSelect = (cardId: string) => {
     setSelectedCards((prev) => {
       if (prev.includes(cardId)) {
@@ -55,7 +63,7 @@ export default function GameBoard() {
 
   const handleStepSynthesis = () => {
     if (selectedCards.length === 0) {
-      setMessage('请选择要使用的卡牌');
+      updateMessage('请选择要使用的卡牌');
       return;
     }
 
@@ -63,60 +71,60 @@ export default function GameBoard() {
       selectedCards,
       synthesisStep,
     );
-    setMessage(result.message);
+    updateMessage(result.message);
     setSelectedCards([]);
     updateGameState();
   };
 
   const handleFullThrowSynthesis = () => {
     if (selectedCards.length === 0) {
-      setMessage('请选择要使用的卡牌');
+      updateMessage('请选择要使用的卡牌');
       return;
     }
 
     const result = gameManager.fullThrowSynthesis(selectedCards);
-    setMessage(result.message);
+    updateMessage(result.message);
     setSelectedCards([]);
     updateGameState();
   };
 
   const handleUseCard = (cardId: string) => {
     const result = gameManager.useCard(cardId);
-    setMessage(result.message);
+    updateMessage(result.message);
     updateGameState();
   };
 
   const handleDiscardCard = (cardId: string) => {
     const success = gameManager.discardCard(cardId);
     if (success) {
-      setMessage('卡牌已丢弃');
+      updateMessage('卡牌已丢弃');
       // 如果丢弃的卡牌在选中列表中，移除它
       setSelectedCards((prev) => prev.filter((id) => id !== cardId));
     } else {
-      setMessage('丢弃失败：卡牌不存在');
+      updateMessage('丢弃失败：卡牌不存在');
     }
     updateGameState();
   };
 
   const handleSellCard = (cardId: string) => {
     const result = gameManager.sellCard(cardId);
-    setMessage(result.message);
+    updateMessage(result.message);
     updateGameState();
   };
 
   const handleBuyCard = (cardKey: string) => {
     const result = gameManager.buyCard(cardKey);
-    setMessage(result.message);
+    updateMessage(result.message);
     updateGameState();
   };
 
   const handleExplore = (location: 'plain' | 'mine' | 'forest' | 'market') => {
     const cards = gameManager.explore(location);
     if (cards === null) {
-      setMessage('能量值不足，无法探索');
+      updateMessage('能量值不足，无法探索');
       return;
     }
-    setMessage(
+    updateMessage(
       `探索成功！获得 ${cards.length} 张卡牌：${cards
         .map((c) => c.name)
         .join('、')}`,
@@ -128,14 +136,14 @@ export default function GameBoard() {
   const handleNextTurn = () => {
     gameManager.nextTurn();
     updateGameState();
-    setMessage('进入下一回合');
+    updateMessage('进入下一回合');
     setSelectedCards([]);
   };
 
   const handleStartNewGame = () => {
     gameManager.startNewGame();
     updateGameState();
-    setMessage('新游戏开始');
+    updateMessage('新游戏开始');
     setSelectedCards([]);
   };
 
@@ -230,6 +238,7 @@ export default function GameBoard() {
                   onStepChange={setSynthesisStep}
                   synthesizer={gameState.synthesizer}
                   message={message}
+                  messageLog={messageLog}
                 />
               </div>
 

@@ -1,6 +1,6 @@
 'use client';
-
 import { Synthesizer, SynthesisStep } from '@/types/game';
+import { useState, useEffect } from 'react';
 
 interface SynthesisPanelProps {
   selectedCards: string[];
@@ -11,6 +11,7 @@ interface SynthesisPanelProps {
   onStepChange: (step: SynthesisStep) => void;
   synthesizer: Synthesizer;
   message?: string;
+  messageLog?: string[];
 }
 
 export function SynthesisPanel({
@@ -21,12 +22,24 @@ export function SynthesisPanel({
   onStepChange,
   message,
   synthesizer,
+  messageLog = [],
 }: SynthesisPanelProps) {
   const stepLabels: Record<SynthesisStep, string> = {
     preprocess: '预处理',
     cook: '烹饪',
     season: '调味',
   };
+
+  // 使用从父组件传递过来的messageLog，显示最近的5条消息
+  const recentMessages = messageLog.slice(-5);
+  const latestTimestamp =
+    messageLog.length > 0
+      ? new Date().toLocaleTimeString('zh-CN', {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit',
+        })
+      : '';
 
   return (
     <div className="rounded-lg p-4 h-full flex flex-col">
@@ -57,7 +70,26 @@ export function SynthesisPanel({
           {synthesisStep === 'preprocess' && <p>需要：刀 + 食材卡</p>}
           {synthesisStep === 'cook' && <p>需要：锅 + 火源 + 预处理过的食材</p>}
           {synthesisStep === 'season' && <p>需要：成品卡 + 辅料卡</p>}
-          {message && <div className="text-[18px]">系统消息：{message}</div>}
+          {/* 日志展示区域 */}
+          {messageLog.length > 0 && (
+            <div className="mt-2 space-y-1 max-h-[100px] overflow-y-auto">
+              {recentMessages.reverse().map((msg, index) => (
+                <div key={index} className="text-[16px] text-gray-800">
+                  <span className="text-gray-500 text-[12px]">
+                    [{latestTimestamp}]
+                  </span>
+                  <span className="text-green-600">系统消息：</span>
+                  {msg}
+                </div>
+              ))}
+            </div>
+          )}
+          {messageLog.length === 0 && message && (
+            <div className="text-[18px] text-gray-800">
+              <span className="text-green-600">系统消息：</span>
+              {message}
+            </div>
+          )}
         </div>
         <div className="absolute top-[55px] w-[33.2px] h-[91.6px] left-[45px] p-4 bg-[url('/assets/images/other/light.png')] bg-cover bg-center "></div>
         <button
