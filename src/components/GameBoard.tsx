@@ -214,7 +214,7 @@ export default function GameBoard() {
         ) : (
           <div className="flex-1 overflow-hidden flex flex-col gap-2">
             {/* 主内容区 */}
-            <div className="flex-1 overflow-hidden flex gap-2 min-h-0">
+            <div className="h-[380px] overflow-hidden flex gap-2 min-h-0">
               {/* 左侧：紧凑的玩家状态和任务 */}
               <div className="w-[350px] flex-shrink-0 flex flex-col gap-2 overflow-y-auto">
                 <PlayerStatus
@@ -283,13 +283,6 @@ export default function GameBoard() {
                 )}
               </div>
             </div>
-
-            {/* 消息提示 */}
-            {message && (
-              <div className="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-2 rounded text-sm flex-shrink-0">
-                <p>{message}</p>
-              </div>
-            )}
           </div>
         )}
       </div>
