@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { GameManager } from '@/game/gameManager';
 import { Card, SynthesisStep } from '@/types/game';
 import { CardDisplay } from './CardDisplay';
-import { SynthesisPanel } from './SynthesisPanel';
+import { SynthesisPanel } from './SynthesisPanel1';
 import { PlayerStatus } from './PlayerStatus';
 import { TaskPanel } from './TaskPanel';
 import { ExplorePanel } from './ExplorePanel';
@@ -208,7 +208,7 @@ export default function GameBoard() {
             {/* 主内容区 */}
             <div className="flex-1 overflow-hidden flex gap-2 min-h-0">
               {/* 左侧：紧凑的玩家状态和任务 */}
-              <div className="w-64 flex-shrink-0 flex flex-col gap-2 overflow-y-auto">
+              <div className="w-[350px] flex-shrink-0 flex flex-col gap-2 overflow-y-auto">
                 <PlayerStatus
                   player={gameState.player}
                   synthesizer={gameState.synthesizer}
@@ -229,11 +229,12 @@ export default function GameBoard() {
                   synthesisStep={synthesisStep}
                   onStepChange={setSynthesisStep}
                   synthesizer={gameState.synthesizer}
+                  message={message}
                 />
               </div>
 
               {/* 右侧：紧凑的探索和商店 */}
-              <div className="w-64 flex-shrink-0 flex flex-col gap-2 overflow-y-auto">
+              <div className="w-[350px] flex-shrink-0 flex flex-col gap-2 overflow-y-auto">
                 <ExplorePanel
                   onExplore={handleExplore}
                   showExplore={showExplore}

@@ -1,0 +1,80 @@
+'use client';
+
+import { Synthesizer, SynthesisStep } from '@/types/game';
+
+interface SynthesisPanelProps {
+  selectedCards: string[];
+  onSelectCard: (cardId: string) => void;
+  onStepSynthesis: () => void;
+  onFullThrowSynthesis: () => void;
+  synthesisStep: SynthesisStep;
+  onStepChange: (step: SynthesisStep) => void;
+  synthesizer: Synthesizer;
+  message?: string;
+}
+
+export function SynthesisPanel({
+  selectedCards,
+  onStepSynthesis,
+  onFullThrowSynthesis,
+  synthesisStep,
+  onStepChange,
+  message,
+  synthesizer,
+}: SynthesisPanelProps) {
+  const stepLabels: Record<SynthesisStep, string> = {
+    preprocess: '预处理',
+    cook: '烹饪',
+    season: '调味',
+  };
+
+  return (
+    <div className="rounded-lg p-4 h-full flex flex-col">
+      <div className="w-[438.8px] h-[331.6px] bg-[url('/assets/images/other/bg.png')] bg-cover bg-center mx-auto mb-4 relative">
+        {/* 合成步骤选择 */}
+        <div className="flex justify-center mb-2 absolute top-2 left-1/2 transform -translate-x-1/2 gap-4">
+          {['preprocess', 'cook', 'season'].map((step) => (
+            <button
+              key={step}
+              onClick={() => onStepChange(step as SynthesisStep)}
+              className={`
+                px-3 py-1.5 rounded-lg text-sm font-medium transition-all
+                ${
+                  synthesisStep === step
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }
+              `}
+            >
+              {stepLabels[step as SynthesisStep]}
+            </button>
+          ))}
+        </div>
+        <div
+          className="absolute top-[50px] w-[350px] h-[220px] left-[40px] p-4 text-[#5B7062]"
+          style={{ fontFamily: "'FusionPixel', monospace" }}
+        >
+          {synthesisStep === 'preprocess' && <p>需要：刀 + 食材卡</p>}
+          {synthesisStep === 'cook' && <p>需要：锅 + 火源 + 预处理过的食材</p>}
+          {synthesisStep === 'season' && <p>需要：成品卡 + 辅料卡</p>}
+          {message && <div className="text-[18px]">系统消息：{message}</div>}
+        </div>
+        <div className="absolute top-[55px] w-[33.2px] h-[91.6px] left-[45px] p-4 bg-[url('/assets/images/other/light.png')] bg-cover bg-center "></div>
+        <button
+          onClick={onStepSynthesis}
+          disabled={!synthesizer.hasEnergy(1) || selectedCards.length === 0}
+          className={`
+            p-2 py-2 rounded-lg font-semibold transition-all text-sm absolute bottom-[10px] right-[50px]
+            ${
+              synthesizer.hasEnergy(1) && selectedCards.length > 0
+                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            }
+          `}
+        >
+          执行 {stepLabels[synthesisStep]}
+        </button>
+      </div>
+    </div>
+  );
+}
