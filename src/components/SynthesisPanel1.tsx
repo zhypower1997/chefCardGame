@@ -35,10 +35,10 @@ export function SynthesisPanel({
   const latestTimestamp =
     messageLog.length > 0
       ? new Date().toLocaleTimeString('zh-CN', {
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit',
-        })
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      })
       : '';
 
   return (
@@ -52,10 +52,9 @@ export function SynthesisPanel({
               onClick={() => onStepChange(step as SynthesisStep)}
               className={`
                 px-3 py-1.5 rounded-lg text-sm font-medium transition-all
-                ${
-                  synthesisStep === step
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                ${synthesisStep === step
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }
               `}
             >
@@ -70,9 +69,15 @@ export function SynthesisPanel({
           {synthesisStep === 'preprocess' && <p>需要：刀 + 食材卡</p>}
           {synthesisStep === 'cook' && <p>需要：锅 + 火源 + 预处理过的食材</p>}
           {synthesisStep === 'season' && <p>需要：成品卡 + 辅料卡</p>}
+          <div className='mix-blend-multiply w-[120px] h-[120px] m-auto'>
+            
+            {synthesisStep === 'preprocess' && <img src="/assets/images/other/pre.gif" alt="" />}
+          {synthesisStep === 'cook' && <img src="/assets/images/other/pr.gif" alt="" />}
+          {synthesisStep === 'season' && <img src="/assets/images/other/tw.gif" alt="" />}
+          </div>
           {/* 日志展示区域 */}
           {messageLog.length > 0 && (
-            <div className="mt-2 space-y-1 max-h-[100px] overflow-y-auto">
+            <div className="mt-2 space-y-1 max-h-[50px] overflow-y-auto">
               {recentMessages.reverse().map((msg, index) => (
                 <div key={index} className="text-[16px] text-gray-800">
                   <span className="text-gray-500 text-[12px]">
@@ -92,20 +97,35 @@ export function SynthesisPanel({
           )}
         </div>
         <div className="absolute top-[55px] w-[33.2px] h-[91.6px] left-[45px] p-4 bg-[url('/assets/images/other/light.png')] bg-cover bg-center "></div>
-        <button
-          onClick={onStepSynthesis}
-          disabled={!synthesizer.hasEnergy(1) || selectedCards.length === 0}
-          className={`
-            p-2 py-2 rounded-lg font-semibold transition-all text-sm absolute bottom-[10px] right-[50px]
-            ${
-              synthesizer.hasEnergy(1) && selectedCards.length > 0
+        <div className="absolute bottom-[10px] right-[50px]">
+          <button
+            onClick={onFullThrowSynthesis}
+            disabled={!synthesizer.hasEnergy(1) || selectedCards.length === 0}
+            className={`
+           py-2 rounded-lg font-semibold transition-all text-sm mr-2 p-2
+            ${synthesizer.hasEnergy(1) && selectedCards.length > 0
+                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }
+          `}
+          >
+            全丢合成
+          </button>
+          <button
+            onClick={onStepSynthesis}
+            disabled={!synthesizer.hasEnergy(1) || selectedCards.length === 0}
+            className={`
+            p-2 py-2 rounded-lg font-semibold transition-all text-sm
+            ${synthesizer.hasEnergy(1) && selectedCards.length > 0
                 ? 'bg-blue-500 text-white hover:bg-blue-600'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-            }
+              }
           `}
-        >
-          执行 {stepLabels[synthesisStep]}
-        </button>
+          >
+            执行 {stepLabels[synthesisStep]}
+          </button>
+        </div>
+
       </div>
     </div>
   );
