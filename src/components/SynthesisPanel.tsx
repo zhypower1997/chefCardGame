@@ -43,7 +43,7 @@ export function SynthesisPanel({
               className={`
                 flex-1 px-2 py-1.5 rounded-lg text-xs font-medium transition-all
                 ${synthesisStep === step
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-gray-600 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }
               `}
@@ -54,7 +54,7 @@ export function SynthesisPanel({
         </div>
 
         {/* 当前步骤说明 */}
-        <div className="bg-blue-50 p-2 rounded-lg mb-2 text-xs text-gray-700">
+        <div className="bg-gray-100 p-2 rounded-lg mb-2 text-xs text-gray-700">
           {synthesisStep === 'preprocess' && (
             <p>需要：刀 + 食材卡</p>
           )}
@@ -72,7 +72,7 @@ export function SynthesisPanel({
           className={`
             w-full py-2 rounded-lg font-semibold transition-all text-sm
             ${synthesizer.hasEnergy(1) && selectedCards.length > 0
-              ? 'bg-blue-500 text-white hover:bg-blue-600'
+              ? 'bg-gray-600 text-white hover:bg-gray-700'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }
           `}
@@ -84,8 +84,8 @@ export function SynthesisPanel({
       {/* 全丢合成 */}
       <div>
         <h3 className="text-base font-semibold mb-2 text-gray-700">全丢合成</h3>
-        <div className="bg-yellow-50 p-2 rounded-lg mb-2 text-xs text-gray-700">
-          <p className="font-semibold text-yellow-800 mb-0.5">⚠️ 风险提示：</p>
+        <div className="bg-gray-100 p-2 rounded-lg mb-2 text-xs text-gray-700">
+          <p className="font-semibold text-gray-800 mb-0.5">⚠️ 风险提示：</p>
           <ul className="list-disc list-inside space-y-0.5">
             <li>工具卡耐久-2（双倍消耗）</li>
             <li>辅料卡直接销毁</li>
@@ -98,7 +98,7 @@ export function SynthesisPanel({
           className={`
             w-full py-2 rounded-lg font-semibold transition-all text-sm
             ${synthesizer.hasEnergy(1) && selectedCards.length > 0
-              ? 'bg-orange-500 text-white hover:bg-orange-600'
+              ? 'bg-gray-600 text-white hover:bg-gray-700'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
             }
           `}

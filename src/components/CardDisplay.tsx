@@ -22,19 +22,19 @@ export function CardDisplay({
   const getCardColor = () => {
     switch (card.cardType) {
       case 'tool':
-        return 'bg-blue-100 border-blue-400';
+        return 'bg-gray-100 border-black';
       case 'food':
         return card.isSpoiled()
-          ? 'bg-gray-300 border-gray-500'
-          : 'bg-green-100 border-green-400';
+          ? 'bg-gray-300 border-black'
+          : 'bg-gray-100 border-black';
       case 'auxiliary':
-        return 'bg-yellow-100 border-yellow-400';
+        return 'bg-gray-100 border-black';
       case 'special':
-        return 'bg-purple-100 border-purple-400';
+        return 'bg-gray-100 border-black';
       case 'product':
-        return 'bg-orange-100 border-orange-400';
+        return 'bg-gray-100 border-black';
       default:
-        return 'bg-gray-100 border-gray-400';
+        return 'bg-gray-100 border-black';
     }
   };
 
@@ -55,14 +55,34 @@ export function CardDisplay({
     }
   };
 
+  const getCardTypeColor = () => {
+    switch (card.cardType) {
+      case 'tool':
+        return 'bg-blue-500 text-white';
+      case 'food':
+        return card.isSpoiled()
+          ? 'bg-gray-500 text-white'
+          : 'bg-green-500 text-white';
+      case 'auxiliary':
+        return 'bg-yellow-500 text-white';
+      case 'special':
+        return 'bg-purple-500 text-white';
+      case 'product':
+        return 'bg-orange-500 text-white';
+      default:
+        return 'bg-white text-gray-600';
+    }
+  };
+
   return (
     <div
       className={`
         relative border-2 rounded-lg p-1.5 cursor-pointer transition-all
         ${getCardColor()}
+        polka-dot-bg-light
         ${
           isSelected
-            ? 'ring-2 ring-yellow-400 scale-[1.03] z-50 shadow-lg'
+            ? 'ring-2 ring-gray-500 scale-[1.03] z-50 shadow-lg'
             : 'hover:scale-[1.02] z-10'
         }
       `}
@@ -73,7 +93,7 @@ export function CardDisplay({
         <h3 className="font-bold text-sm text-gray-800 leading-tight">
           {card.name}
         </h3>
-        <span className="text-xs bg-white px-1 py-0.5 rounded text-gray-600 leading-tight">
+        <span className={`text-xs px-1 py-0.5 rounded leading-tight ${getCardTypeColor()}`}>
           {getCardTypeLabel()}
         </span>
       </div>
@@ -97,13 +117,13 @@ export function CardDisplay({
         <div className="space-y-0.5">
           <div
             className={`text-xs ${
-              card.isSpoiled() ? 'text-red-600 font-bold' : 'text-gray-600'
+              card.isSpoiled() ? 'text-gray-800 font-bold' : 'text-gray-600'
             }`}
           >
             {card.isSpoiled() ? '已变质' : `剩余: ${card.remainingSpoil}回合`}
           </div>
           {card.isPreprocessed && (
-            <div className="text-xs bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-semibold">
+            <div className="text-xs bg-gray-200 text-gray-800 px-1 py-0.5 rounded font-semibold">
               ✂️ 已预处理
             </div>
           )}
@@ -119,7 +139,7 @@ export function CardDisplay({
 
       {/* 特性 */}
       {card.trait && (
-        <div className="text-xs text-purple-600 mb-0.5 leading-tight">
+        <div className="text-xs text-gray-700 mb-0.5 leading-tight">
           ✨ {card.trait.name}
         </div>
       )}
@@ -137,17 +157,17 @@ export function CardDisplay({
       {card.cardType === 'product' && (
         <div className="text-xs space-y-0.5">
           {card.healValue && (
-            <div className="bg-green-100 text-green-700 px-1 py-0.5 rounded font-medium">
+            <div className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded font-medium">
               🍽️ 回复: {card.healValue} 饥饿
             </div>
           )}
           {card.buffEffect && (
-            <div className="bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-medium line-clamp-1">
+            <div className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded font-medium line-clamp-1">
               💫 {card.buffEffect}
             </div>
           )}
           {card.tradeValue && (
-            <div className="bg-yellow-100 text-yellow-700 px-1 py-0.5 rounded font-medium">
+            <div className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded font-medium">
               💰 交易价值: {card.tradeValue}
             </div>
           )}
@@ -167,7 +187,7 @@ export function CardDisplay({
               e.stopPropagation();
               onUse();
             }}
-            className="w-full bg-orange-500 text-white text-xs py-0.5 rounded hover:bg-orange-600"
+            className="w-full bg-gray-600 text-white text-xs py-0.5 rounded hover:bg-gray-700"
           >
             使用
           </button>
@@ -217,7 +237,7 @@ export function CardDisplay({
                   onSell();
                 }
               }}
-              className="bg-green-500 text-white text-xs py-0.5 rounded hover:bg-green-600"
+              className="bg-gray-500 text-white text-xs py-0.5 rounded hover:bg-gray-600"
             >
               售卖
             </button>
@@ -227,7 +247,7 @@ export function CardDisplay({
 
       {/* 选中标记 */}
       {isSelected && (
-        <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-yellow-400 rounded-full flex items-center justify-center">
+        <div className="absolute top-0.5 right-0.5 w-4 h-4 bg-gray-600 rounded-full flex items-center justify-center">
           <span className="text-white text-xs font-bold">✓</span>
         </div>
       )}

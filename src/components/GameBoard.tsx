@@ -148,11 +148,11 @@ export default function GameBoard() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-amber-50 to-orange-100 p-2 overflow-hidden flex flex-col">
+    <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 overflow-hidden flex flex-col">
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* 顶部标题栏 */}
         <div className="mb-2 flex justify-between items-center flex-shrink-0">
-          <h1 className="text-2xl font-bold text-orange-800">
+          <h1 className="text-2xl font-bold text-gray-800">
             逗逗狐的合成厨房
           </h1>
 
@@ -166,13 +166,13 @@ export default function GameBoard() {
                 <span className="text-gray-700 font-semibold text-sm">
                   能量值
                 </span>
-                <span className="text-base font-bold text-blue-600">
+                <span className="text-base font-bold text-gray-700">
                   {gameState.synthesizer.energy}/
                   {gameState.synthesizer.maxEnergy}
                 </span>
                 <div className="w-24 bg-gray-200 rounded-full h-2">
                   <div
-                    className="bg-blue-500 h-2 rounded-full transition-all"
+                    className="bg-gray-600 h-2 rounded-full transition-all"
                     style={{
                       width: `${(gameState.synthesizer.energy /
                         gameState.synthesizer.maxEnergy) *
@@ -188,13 +188,13 @@ export default function GameBoard() {
             </div>
             <button
               onClick={handleStartNewGame}
-              className="px-3 py-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm"
+              className="px-3 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm"
             >
               新游戏
             </button>
             <button
               onClick={handleNextTurn}
-              className="px-4 py-1.5 bg-green-500 text-white rounded-lg hover:bg-green-600 font-semibold text-sm"
+              className="px-4 py-1.5 bg-gray-600 text-white rounded-lg hover:bg-gray-700 font-semibold text-sm"
             >
               下一回合
             </button>
@@ -202,13 +202,13 @@ export default function GameBoard() {
         </div>
 
         {gameState.gameOver ? (
-          <div className="bg-red-500 text-white p-8 rounded-lg text-center flex-1 flex items-center justify-center">
+          <div className="bg-gray-800 text-white p-8 rounded-lg text-center flex-1 flex items-center justify-center">
             <div>
               <h2 className="text-3xl font-bold mb-4">游戏结束</h2>
               <p className="text-xl">生命值归零，游戏失败</p>
               <button
                 onClick={handleStartNewGame}
-                className="mt-4 px-6 py-3 bg-white text-red-500 rounded-lg hover:bg-gray-100"
+                className="mt-4 px-6 py-3 bg-white text-gray-800 rounded-lg hover:bg-gray-100"
               >
                 重新开始
               </button>

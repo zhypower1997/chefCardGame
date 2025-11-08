@@ -53,7 +53,7 @@ export function SynthesisPanel({
               className={`
                 px-3 py-1.5 rounded-lg text-sm font-medium transition-all
                 ${synthesisStep === step
-                  ? 'bg-blue-500 text-white'
+                  ? 'bg-gray-600 text-white'
                   : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
                 }
               `}
@@ -83,7 +83,7 @@ export function SynthesisPanel({
                   <span className="text-gray-500 text-[12px]">
                     [{latestTimestamp}]
                   </span>
-                  <span className="text-green-600">系统消息：</span>
+                  <span className="text-gray-700">系统消息：</span>
                   {msg}
                 </div>
               ))}
@@ -91,7 +91,7 @@ export function SynthesisPanel({
           )}
           {messageLog.length === 0 && message && (
             <div className="text-[18px] text-gray-800">
-              <span className="text-green-600">系统消息：</span>
+              <span className="text-gray-700">系统消息：</span>
               {message}
             </div>
           )}
@@ -104,7 +104,7 @@ export function SynthesisPanel({
             className={`
            py-2 rounded-lg font-semibold transition-all text-sm mr-2 p-2
             ${synthesizer.hasEnergy(1) && selectedCards.length > 0
-                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                ? 'bg-gray-600 text-white hover:bg-gray-700'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }
           `}
@@ -117,7 +117,7 @@ export function SynthesisPanel({
             className={`
             p-2 py-2 rounded-lg font-semibold transition-all text-sm
             ${synthesizer.hasEnergy(1) && selectedCards.length > 0
-                ? 'bg-blue-500 text-white hover:bg-blue-600'
+                ? 'bg-gray-600 text-white hover:bg-gray-700'
                 : 'bg-gray-300 text-gray-500 cursor-not-allowed'
               }
           `}

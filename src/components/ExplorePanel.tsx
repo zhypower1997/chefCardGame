@@ -46,7 +46,7 @@ export function ExplorePanel({ onExplore, showExplore, onToggleExplore, hasEnerg
         <h2 className="text-lg font-bold text-gray-800">探索</h2>
         <button
           onClick={onToggleExplore}
-          className="px-2 py-1 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm"
+          className="px-2 py-1 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm"
         >
           {showExplore ? '收起' : '探索'}
         </button>
@@ -62,7 +62,7 @@ export function ExplorePanel({ onExplore, showExplore, onToggleExplore, hasEnerg
               className={`
                 w-full p-2 rounded-lg border-2 transition-all text-left
                 ${hasEnergy
-                  ? 'bg-gradient-to-r from-green-50 to-blue-50 border-green-200 hover:border-green-400'
+                  ? 'bg-gray-50 border-gray-300 hover:border-gray-500'
                   : 'bg-gray-100 border-gray-300 cursor-not-allowed opacity-50'
                 }
               `}

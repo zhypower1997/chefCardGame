@@ -20,7 +20,7 @@ export function ShopPanel({ onBuy, showShop, onToggleShop, playerCoins }: ShopPa
           <span className="text-xs text-gray-600">💰 {playerCoins}</span>
           <button
             onClick={onToggleShop}
-            className="px-2 py-1 bg-purple-500 text-white rounded-lg hover:bg-purple-600 text-sm"
+            className="px-2 py-1 bg-gray-600 text-white rounded-lg hover:bg-gray-700 text-sm"
           >
             {showShop ? '收起' : '商店'}
           </button>
@@ -39,7 +39,7 @@ export function ShopPanel({ onBuy, showShop, onToggleShop, playerCoins }: ShopPa
                 className={`
                   w-full p-2 rounded-lg border-2 transition-all text-left
                   ${canAfford
-                    ? 'bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200 hover:border-purple-400 hover:shadow-md'
+                    ? 'bg-gray-50 border-gray-300 hover:border-gray-500 hover:shadow-md'
                     : 'bg-gray-100 border-gray-300 cursor-not-allowed opacity-50'
                   }
                 `}
@@ -49,7 +49,7 @@ export function ShopPanel({ onBuy, showShop, onToggleShop, playerCoins }: ShopPa
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <h3 className="font-bold text-gray-800 text-sm">{item.name}</h3>
-                      <span className={`text-base font-bold ${canAfford ? 'text-purple-600' : 'text-gray-400'}`}>
+                      <span className={`text-base font-bold ${canAfford ? 'text-gray-700' : 'text-gray-400'}`}>
                         💰 {item.price}
                       </span>
                     </div>

@@ -17,8 +17,8 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
         <div className="flex justify-between items-center mb-1">
           <span className="text-gray-700 font-semibold text-sm">❤️ 生命值</span>
           <span className={`text-base font-bold ${
-            player.health <= 3 ? 'text-red-600' : 
-            player.health <= 6 ? 'text-orange-600' : 'text-green-600'
+            player.health <= 3 ? 'text-gray-800' : 
+            player.health <= 6 ? 'text-gray-700' : 'text-gray-700'
           }`}>
             {player.health}/{player.maxHealth}
           </span>
@@ -26,8 +26,8 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className={`h-2 rounded-full transition-all ${
-              player.health <= 3 ? 'bg-red-500' : 
-              player.health <= 6 ? 'bg-orange-500' : 'bg-green-500'
+              player.health <= 3 ? 'bg-gray-800' : 
+              player.health <= 6 ? 'bg-gray-600' : 'bg-gray-500'
             }`}
             style={{ width: `${(player.health / player.maxHealth) * 100}%` }}
           />
@@ -39,8 +39,8 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
         <div className="flex justify-between items-center mb-1">
           <span className="text-gray-700 font-semibold text-sm">🍖 饥饿值</span>
           <span className={`text-base font-bold ${
-            player.hunger === 0 ? 'text-red-600' : 
-            player.hunger <= 3 ? 'text-orange-600' : 'text-green-600'
+            player.hunger === 0 ? 'text-gray-800' : 
+            player.hunger <= 3 ? 'text-gray-700' : 'text-gray-700'
           }`}>
             {player.hunger}/{player.maxHunger}
           </span>
@@ -48,14 +48,14 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className={`h-2 rounded-full transition-all ${
-              player.hunger === 0 ? 'bg-red-500' : 
-              player.hunger <= 3 ? 'bg-orange-500' : 'bg-green-500'
+              player.hunger === 0 ? 'bg-gray-800' : 
+              player.hunger <= 3 ? 'bg-gray-600' : 'bg-gray-500'
             }`}
             style={{ width: `${(player.hunger / player.maxHunger) * 100}%` }}
           />
         </div>
         {player.hunger === 0 && (
-          <p className="text-xs text-red-600 mt-0.5">⚠️ 饥饿值为0，每回合扣1生命值</p>
+          <p className="text-xs text-gray-800 mt-0.5">⚠️ 饥饿值为0，每回合扣1生命值</p>
         )}
       </div>
 
@@ -65,7 +65,7 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
           <h3 className="text-xs font-semibold text-gray-700 mb-1">💫 Buff效果</h3>
           <div className="space-y-0.5">
             {player.buffs.map((buff, index) => (
-              <div key={index} className="bg-purple-50 p-1 rounded text-xs">
+              <div key={index} className="bg-gray-100 p-1 rounded text-xs">
                 <span className="font-medium">{buff.name}</span>
                 <span className="text-gray-600 ml-1">剩余 {buff.remainingTurns} 回合</span>
               </div>
@@ -78,7 +78,7 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
       <div className="mb-2">
         <div className="flex justify-between items-center">
           <span className="text-gray-700 font-semibold text-sm">💰 金币</span>
-          <span className="text-base font-bold text-yellow-600">
+          <span className="text-base font-bold text-gray-700">
             {player.coins}
           </span>
         </div>
@@ -86,27 +86,27 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
 
       {/* 卡牌统计 */}
       <div className="grid grid-cols-2 gap-1.5 text-xs">
-        <div className="bg-blue-50 p-1.5 rounded">
-          <div className="font-semibold text-blue-700 text-xs">工具</div>
-          <div className="text-xl font-bold text-blue-600">
+        <div className="bg-gray-100 p-1.5 rounded">
+          <div className="font-semibold text-gray-700 text-xs">工具</div>
+          <div className="text-xl font-bold text-gray-700">
             {player.getCardsByType('tool').length}
           </div>
         </div>
-        <div className="bg-green-50 p-1.5 rounded">
-          <div className="font-semibold text-green-700 text-xs">食材</div>
-          <div className="text-xl font-bold text-green-600">
+        <div className="bg-gray-100 p-1.5 rounded">
+          <div className="font-semibold text-gray-700 text-xs">食材</div>
+          <div className="text-xl font-bold text-gray-700">
             {player.getCardsByType('food').length}
           </div>
         </div>
-        <div className="bg-yellow-50 p-1.5 rounded">
-          <div className="font-semibold text-yellow-700 text-xs">辅料</div>
-          <div className="text-xl font-bold text-yellow-600">
+        <div className="bg-gray-100 p-1.5 rounded">
+          <div className="font-semibold text-gray-700 text-xs">辅料</div>
+          <div className="text-xl font-bold text-gray-700">
             {player.getCardsByType('auxiliary').length}
           </div>
         </div>
-        <div className="bg-orange-50 p-1.5 rounded">
-          <div className="font-semibold text-orange-700 text-xs">成品</div>
-          <div className="text-xl font-bold text-orange-600">
+        <div className="bg-gray-100 p-1.5 rounded">
+          <div className="font-semibold text-gray-700 text-xs">成品</div>
+          <div className="text-xl font-bold text-gray-700">
             {player.getCardsByType('product').length}
           </div>
         </div>
