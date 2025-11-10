@@ -25,11 +25,11 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className={`h-2 rounded-full transition-all ${
-              player.health <= 3 ? 'bg-gray-800' : 
-              player.health <= 6 ? 'bg-gray-600' : 'bg-gray-500'
-            }`}
-            style={{ width: `${(player.health / player.maxHealth) * 100}%` }}
+            className="h-2 rounded-full transition-all striped-bg"
+            style={{
+              width: `${(player.health / player.maxHealth) * 100}%`,
+              backgroundColor: player.health <= 3 ? '#1f2937' : player.health <= 6 ? '#4b5563' : '#6b7280',
+            }}
           />
         </div>
       </div>
@@ -47,11 +47,11 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className={`h-2 rounded-full transition-all ${
-              player.hunger === 0 ? 'bg-gray-800' : 
-              player.hunger <= 3 ? 'bg-gray-600' : 'bg-gray-500'
-            }`}
-            style={{ width: `${(player.hunger / player.maxHunger) * 100}%` }}
+            className="h-2 rounded-full transition-all striped-bg"
+            style={{
+              width: `${(player.hunger / player.maxHunger) * 100}%`,
+              backgroundColor: player.hunger === 0 ? '#1f2937' : player.hunger <= 3 ? '#4b5563' : '#6b7280',
+            }}
           />
         </div>
         {player.hunger === 0 && (
@@ -85,7 +85,7 @@ export function PlayerStatus({ player, synthesizer }: PlayerStatusProps) {
       </div>
 
       {/* 卡牌统计 */}
-      <div className="grid grid-cols-2 gap-1.5 text-xs">
+      <div className="grid grid-cols-4 gap-1.5 text-xs">
         <div className="bg-gray-100 p-1.5 rounded">
           <div className="font-semibold text-gray-700 text-xs">工具</div>
           <div className="text-xl font-bold text-gray-700">

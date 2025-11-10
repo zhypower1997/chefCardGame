@@ -74,12 +74,29 @@ export function CardDisplay({
     }
   };
 
+  const getPolkaDotClass = () => {
+    switch (card.cardType) {
+      case 'tool':
+        return 'polka-dot-tool';
+      case 'food':
+        return card.isSpoiled() ? 'polka-dot-food-spoiled' : 'polka-dot-food';
+      case 'auxiliary':
+        return 'polka-dot-auxiliary';
+      case 'special':
+        return 'polka-dot-special';
+      case 'product':
+        return 'polka-dot-product';
+      default:
+        return 'polka-dot-bg-light';
+    }
+  };
+
   return (
     <div
       className={`
         relative border-2 rounded-lg p-1.5 cursor-pointer transition-all
         ${getCardColor()}
-        polka-dot-bg-light
+        ${getPolkaDotClass()}
         ${
           isSelected
             ? 'ring-2 ring-gray-500 scale-[1.03] z-50 shadow-lg'

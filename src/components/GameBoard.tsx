@@ -148,13 +148,18 @@ export default function GameBoard() {
   };
 
   return (
-    <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-2 overflow-hidden flex flex-col">
+    <div className="h-screen bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden flex flex-col">
       <div className="flex-1 overflow-hidden flex flex-col">
         {/* 顶部标题栏 */}
-        <div className="mb-2 flex justify-between items-center flex-shrink-0">
-          <h1 className="text-2xl font-bold text-gray-800">
-            逗逗狐的合成厨房
-          </h1>
+        <div className="mb-2 border-b border-gray-300 flex justify-between items-center flex-shrink-0 pl-2 pr-2">
+          <div className="flex items-center gap-3 h-full">
+            <img src="/assets/images/other/logo.png" alt="" className='w-[50px] h-[50px]' />
+
+            <h1 className="text-2xl font-bold text-gray-800">
+              逗逗狐的合成厨房
+            </h1>
+            <div className="self-stretch w-px bg-gray-300"></div>
+          </div>
 
           <div className="flex items-center gap-4">
             <div className="cursor-pointer" onClick={() => {
@@ -215,7 +220,7 @@ export default function GameBoard() {
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-hidden flex flex-col gap-2">
+          <div className="flex-1 overflow-hidden flex flex-col gap-2 pl-2 pr-2 pb-2">
             {/* 主内容区 */}
             <div className="h-[380px] overflow-hidden flex gap-2 min-h-0">
               {/* 左侧：紧凑的玩家状态和任务 */}

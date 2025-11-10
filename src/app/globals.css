@@ -30,3 +30,64 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 波点背景样式 */
+.polka-dot-bg {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.15) 2px, transparent 2px);
+  background-size: 10px 10px;
+  background-position: 0 0;
+}
+
+.polka-dot-bg-light {
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.1) 2px, transparent 2px);
+  background-size: 10px 10px;
+  background-position: 0 0;
+}
+
+/* 卡牌类型波点背景 */
+.polka-dot-tool {
+  background-image: radial-gradient(circle, rgba(59, 130, 246, 0.2) 2px, transparent 2px);
+  background-size: 10px 10px;
+  background-position: 0 0;
+}
+
+.polka-dot-food {
+  background-image: radial-gradient(circle, rgba(34, 197, 94, 0.2) 2px, transparent 2px);
+  background-size: 10px 10px;
+  background-position: 0 0;
+}
+
+.polka-dot-food-spoiled {
+  background-image: radial-gradient(circle, rgba(107, 114, 128, 0.2) 2px, transparent 2px);
+  background-size: 10px 10px;
+  background-position: 0 0;
+}
+
+.polka-dot-auxiliary {
+  background-image: radial-gradient(circle, rgba(234, 179, 8, 0.2) 2px, transparent 2px);
+  background-size: 10px 10px;
+  background-position: 0 0;
+}
+
+.polka-dot-special {
+  background-image: radial-gradient(circle, rgba(168, 85, 247, 0.2) 2px, transparent 2px);
+  background-size: 10px 10px;
+  background-position: 0 0;
+}
+
+.polka-dot-product {
+  background-image: radial-gradient(circle, rgba(249, 115, 22, 0.2) 2px, transparent 2px);
+  background-size: 10px 10px;
+  background-position: 0 0;
+}
+
+/* 黑白斜线背景样式 */
+.striped-bg {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.4) 2px,
+    rgba(255, 255, 255, 0.2) 2px,
+    rgba(255, 255, 255, 0.2) 4px
+  );
+}

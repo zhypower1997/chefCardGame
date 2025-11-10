@@ -80,7 +80,7 @@ export function SynthesisPanel({
             <div className="mt-2 space-y-1 max-h-[50px] overflow-y-auto">
               {recentMessages.reverse().map((msg, index) => (
                 <div key={index} className="text-[16px] text-gray-800">
-                  <span className="text-gray-500 text-[12px]">
+                  <span className="text-green-600 text-[12px]">
                     [{latestTimestamp}]
                   </span>
                   <span className="text-gray-700">系统消息：</span>
